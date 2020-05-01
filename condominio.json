@@ -13,7 +13,11 @@
             "id":{
                 "caption":"id_caption",
                 "helper":"this is the helper for id",
-                "type":"str, int or float",
+                "type":"str, int, float, date, bool",
+                "lenght_max":100,
+                "lenght_min":0,
+                "capitalize":"Upper, Lower, Capitalize, None",
+                "alowed_chars":"abcdefghijklmnopqrstuvwxyz0123456789.,",
                 "decimal_places":2,
                 "visible":true,
                 "enabled":true
