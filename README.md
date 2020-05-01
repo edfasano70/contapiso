@@ -7,4 +7,4 @@ Programa en Python para la administración de condominios: <br>
 	Genera reportes en Pdf<br>
 	Envía recibos por email<br>
 	Estamos en GitHub como https://github.com/edfasano70/condominio.git<br>
-	esta es otra prueba
+
