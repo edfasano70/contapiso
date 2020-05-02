@@ -51,12 +51,19 @@ while True:
 		data['id']=str(maxId(database,table,'id')+1)
 		if insertRow(database,table,data):
 			print('<Ok> Nuevo registro ingresado')
-			modificarRegistro(database,table,'id',data['id'])
+			modificarRegistro('id',data['id'],views[table])
 		else:
 			print('<!> No se pudo ingresar el registro')
+
+
+
+
 	elif opcion=='M':
 		id=int(input('<?> Ingrese ID del registro a Modificar_'))
-		modificarRegistro(database,table,'id',id)
+		modificarRegistro('id',id,views[table])
+
+
+
 	elif opcion=='B':
 		id=int(input('<?> Ingrese ID del registro a BORRAR_'))
 		if recordExist(database,table,'id',id):
@@ -65,11 +72,20 @@ while True:
 			print('<Ok> Operación exitosa')
 		else:
 			print('<!> Registro no existe')
+
+
+
 	elif opcion=='I': #importar csv
 		filename=input('<?> Ingrese NOMBRE del archivo a importar_')
 		importCsv(database,table,filename)
+
+
+
 	elif opcion=='E': #exportar csv
 		pass
+
+
+
 	elif opcion=='T':
 		tmp=(tableList(database))
 		print('Tablas disponibles :',tmp)
@@ -78,8 +94,14 @@ while True:
 			table=tmp2
 		else:
 			print('<!> Valor introducido incorrecto')
+
+
+
 	else:
 		input('<!> Opción no válida.')
 	input('Pulse ENTER para continuar...')
+
+
+
 clear()
 sys.exit()

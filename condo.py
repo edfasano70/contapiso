@@ -595,7 +595,7 @@ def importCsv(database,table,filename):
 			print(data)
 			insertRow(database,table,data)
 
-def modificarRegistro(database,table,id_name,id_value):
+def modificarRegistro(id_name,id_value,style):
 #
 # Descripción: modifica un registro preguntando valores
 # Entrada:
@@ -606,17 +606,27 @@ def modificarRegistro(database,table,id_name,id_value):
 # Regresa:
 # 	DEBERIA regresar bool - True si se modificó
 #
+	database=style['database']
+	table=style['table']
+
 	if recordExist(database,table,id_name,id_value):
 		row=getRow(database,table,id_name,id_value)
 		data={}
 		for c in row.keys():
-			tmp=input('{} [{}]='.format(c,row[c]))
+			try:
+				caption=style['columns'][c]['caption']
+			except:
+				caption=c
+			try:
+				helper=style['columns'][c]['helper']
+			except:
+				helper=''
+			tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
+			#tmp=input('{} [{}]='.format(c,row[c]))
 			if tmp!='':
 				data[c]=tmp.upper()
 			else:
 				data[c]=str(row[c]).upper()
-		#print(data)
-		#input()
 		updateRow(database,table,data)
 		print('<Ok> Registro actualizado')
 	else:
