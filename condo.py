@@ -613,22 +613,66 @@ def modificarRegistro(id_name,id_value,style):
 		row=getRow(database,table,id_name,id_value)
 		data={}
 		for c in row.keys():
+
 			try:
-				caption=style['columns'][c]['caption']
+				cStyle=style['columns'][c]
 			except:
-				caption=c
-			try:
-				helper=style['columns'][c]['helper']
-			except:
-				helper=''
-			tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
-			#tmp=input('{} [{}]='.format(c,row[c]))
-			if tmp!='':
-				data[c]=tmp.upper()
-			else:
-				data[c]=str(row[c]).upper()
+				cStyle={'type':'str'}
+			while True:
+
+				try:
+					caption=cStyle['caption']
+				except:
+					caption=c
+				helper=cStyle.get('helper','')
+				# try:
+				# 	helper=style['columns'][c]['helper']
+				# except:
+				# 	helper=''
+				if cStyle.get('enabled',True):
+					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
+				else:
+					print('{} :{}'.format(caption,row[c]))
+					data[c]=str(row[c])
+					break
+				
+				if tmp=='' or tmp==row[c]:
+					data[c]=str(row[c])
+					break
+				else:
+					# try:
+					# 	tmp2=style['columns'][c]
+					# except Exception as e:
+					# 	tmp2={'type':'str'}
+					res,tmp=validateInput(tmp,cStyle)
+					if res:
+						data[c]=tmp 
+						break
+
+
+
 		updateRow(database,table,data)
 		print('<Ok> Registro actualizado')
 	else:
 		print('<!> Registro no existe')
+
+def validateInput(value,params={'type':'str'}):
+	res=True
+	type=params['type']
+	if type=='str':
+		pass
+	elif type=='int':
+		pass
+	elif type=='float':
+		pass
+	elif type=='date':
+		pass
+	elif type=='bool':
+		pass
+	elif type=='email':
+		pass
+	else:
+		pass
+
+	return res, value
 

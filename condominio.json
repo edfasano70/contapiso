@@ -13,7 +13,7 @@
             "id":{
                 "caption":"id_caption",
                 "helper":"this is the helper for id",
-                "type":"str, int, float, date, bool",
+                "type":"str, int, float, date, bool, email",
                 "lenght_max":100,
                 "lenght_min":0,
                 "capitalize":"Upper, Lower, Capitalize, None",
