@@ -613,37 +613,27 @@ def modificarRegistro(id_name,id_value,style):
 		row=getRow(database,table,id_name,id_value)
 		data={}
 		for c in row.keys():
-
 			try:
 				cStyle=style['columns'][c]
 			except:
 				cStyle={'type':'str'}
 			while True:
-
 				try:
 					caption=cStyle['caption']
 				except:
 					caption=c
 				helper=cStyle.get('helper','')
-				# try:
-				# 	helper=style['columns'][c]['helper']
-				# except:
-				# 	helper=''
+
 				if cStyle.get('enabled',True):
 					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
 				else:
 					print('{} :{}'.format(caption,row[c]))
 					data[c]=str(row[c])
 					break
-				
 				if tmp=='' or tmp==row[c]:
 					data[c]=str(row[c])
 					break
 				else:
-					# try:
-					# 	tmp2=style['columns'][c]
-					# except Exception as e:
-					# 	tmp2={'type':'str'}
 					res,tmp=validateInput(tmp,cStyle)
 					if res:
 						data[c]=tmp 
