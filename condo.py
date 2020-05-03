@@ -624,33 +624,65 @@ def modificarRegistro(id_name,id_value,style):
 					caption=c
 				helper=cStyle.get('helper','')
 
+				if row[c]==None: row[c]=''
+
 				if cStyle.get('enabled',True):
 					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
 				else:
 					print('{} :{}'.format(caption,row[c]))
 					data[c]=str(row[c])
 					break
-				if tmp=='' or tmp==row[c]:
-					data[c]=str(row[c])
+				if tmp=='': tmp=row[c]
+				res, tmp, msg=validateInput(tmp,cStyle)
+				if msg!='':print(msg)
+				if res:
+					data[c]=tmp 
 					break
-				else:
-					res,tmp=validateInput(tmp,cStyle)
-					if res:
-						data[c]=tmp 
-						break
 
 
 
 		updateRow(database,table,data)
-		print('<Ok> Registro actualizado')
+		print(Fore.BLACK+Back.GREEN+'[Ok] Registro actualizado'+Style.RESET_ALL)
 	else:
-		print('<!> Registro no existe')
+		print(Fore.BLACK+Back.RED+'[!] El registro id = {} no existe'.format(id_value)+Style.RESET_ALL)
 
 def validateInput(value,params={'type':'str'}):
 	res=True
+	msg=''
 	type=params['type']
 	if type=='str':
-		pass
+		#verificamos los caracteres permitidos
+		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+		tmp=value.upper()
+		tmp2=''
+		tmp3=''
+		for i in range(0,len(value)):
+			if tmp[i] not in allowed_chars:
+				if value[i] not in tmp3: tmp3+=value[i]
+				res=False
+			else:
+				tmp2+=value[i]
+
+		value=tmp2
+
+		if tmp3!='': print('caracteres no permitidos:',tmp3)
+
+		#verificamos capitalización
+		if params.get('capitalize',None)=='upper':
+			value=value.upper()
+		elif params.get('capitalize',None)=='lower':
+			value=value.lower()
+		elif params.get('capitalize',None)=='capitalize':
+			value=value.capitalize()
+		#verificamos longitud minima y maxima
+		if len(value)<params.get('lenght_min',0):
+			res=False
+			msg+='[!] ERROR: Debe tener al menos {} caracteres\n'.format(params.get('lenght_min',0))
+		if len(value)>params.get('lenght_max',20):
+			value=value[0:params.get('lenght_max',20)]
+			msg+='[!] WARNING: Longitud supera la máxima de {} caracateres\n'.format(params.get('lenght_max',20))	
+
 	elif type=='int':
 		pass
 	elif type=='float':
@@ -664,5 +696,5 @@ def validateInput(value,params={'type':'str'}):
 	else:
 		pass
 
-	return res, value
+	return res, value, msg
 

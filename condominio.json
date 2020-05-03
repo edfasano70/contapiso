@@ -16,7 +16,7 @@
                 "type":"str, int, float, date, bool, email",
                 "lenght_max":100,
                 "lenght_min":0,
-                "capitalize":"Upper, Lower, Capitalize, None",
+                "capitalize":"upper, lower, capitalize, none",
                 "alowed_chars":"abcdefghijklmnopqrstuvwxyz0123456789.,",
                 "decimal_places":2,
                 "visible":true,
@@ -47,6 +47,9 @@
                 "caption":"CODIGO",
                 "helper":"Código de Local",
                 "type":"str",
+                "capitalize":"upper",
+                "lenght_min":4,
+                "lenght_max":10,
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true
@@ -71,6 +74,9 @@
                 "caption":"PROPIETARIO",
                 "helper":"Propietario",
                 "type":"str",
+                "capitalize":"upper",
+                "lenght_min":10,
+                "lenght_max":40,
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true
@@ -79,6 +85,9 @@
                 "caption":"INQUILINO",
                 "helper":"Inquilino",
                 "type":"str",
+                "capitalize":"upper",
+                "lenght_min":10,
+                "lenght_max":40,
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true

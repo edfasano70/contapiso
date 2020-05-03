@@ -43,40 +43,58 @@ while True:
 		else:
 			print(rl+Style.RESET_ALL)
 
-	opcion=input('{0}[N]{1}uevo {0}[M]{1}odificar {0}[B]{1}orrar {0}[I]{1}mportar {0}[E]{1}xportar {0}[T]{1}abla e{0}[X]{1}it ?_'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()[0:1]
+	tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar {0}I{1}mportar {0}E{1}xportar {0}T{1}abla e{0}X{1}it > '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
+	#[0:1]
+	
+	command=tmp.split(' ')
+	#print(command)
+	opcion=command[0]
+	if len(command)>1:
+		opPar=int(command[1])
+	else:
+		opPar=0
+
 	if opcion=='X':
 		break
 	elif opcion=='N':
 		data={}
 		data['id']=str(maxId(database,table,'id')+1)
 		if insertRow(database,table,data):
-			print('<Ok> Nuevo registro ingresado')
+			print('[Ok] Nuevo registro ingresado')
 			modificarRegistro('id',data['id'],views[table])
 		else:
-			print('<!> No se pudo ingresar el registro')
+			print('[!] ERROR: No se pudo ingresar el registro')
 
 
 
 
 	elif opcion=='M':
-		id=int(input('<?> Ingrese ID del registro a Modificar_'))
+		#print('opPar',opPar)
+		if opPar==0:
+			id=int(input('[?] Ingrese ID del registro a MODIFICAR > '))
+		else:
+			id=opPar
 		modificarRegistro('id',id,views[table])
 
 
 
 	elif opcion=='B':
-		id=int(input('<?> Ingrese ID del registro a BORRAR_'))
+		if opPar==0:
+			id=int(input('[?] Ingrese ID del registro a BORRAR > '))
+		else:
+			id=opPar
+		#id=int(input('<?> Ingrese ID del registro a BORRAR_'))
 		if recordExist(database,table,'id',id):
 			deleteRow(database,table,'id',id)
 			defragmentTable(database,table)
-			print('<Ok> Operación exitosa')
+			print('[Ok] Operación exitosa. Registro BORRADO')
 		else:
-			print('<!> Registro no existe')
+			print('[!] ERROR: Registro no existe')
 
 
 
 	elif opcion=='I': #importar csv
-		filename=input('<?> Ingrese NOMBRE del archivo a importar_')
+		filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
 		importCsv(database,table,filename)
 
 
@@ -89,16 +107,16 @@ while True:
 	elif opcion=='T':
 		tmp=(tableList(database))
 		print('Tablas disponibles :',tmp)
-		tmp2=input('<?> Ingrese NOMBRE de la tabla_')
+		tmp2=input('[?] Ingrese NOMBRE de la tabla > ')
 		if tmp2 in tmp:
 			table=tmp2
 		else:
-			print('<!> Valor introducido incorrecto')
+			print('[!] ERROR: Valor introducido NO EXISTE')
 
 
 
 	else:
-		input('<!> Opción no válida.')
+		print('[!] Opción no válida. H para ayuda')
 	input('Pulse ENTER para continuar...')
 
 
