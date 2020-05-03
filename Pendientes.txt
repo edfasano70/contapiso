@@ -1,0 +1,3 @@
+Pendientes:
+usar modulo csv para la importación de datos
+crear función para mostrar alertas por consola tipo msgbox
