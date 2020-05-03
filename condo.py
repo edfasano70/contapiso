@@ -652,7 +652,7 @@ def validateInput(value,params={'type':'str'}):
 	type=params['type']
 	if type=='str':
 		#verificamos los caracteres permitidos
-		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 
 		tmp=value.upper()
 		tmp2=''
@@ -666,7 +666,7 @@ def validateInput(value,params={'type':'str'}):
 
 		value=tmp2
 
-		if tmp3!='': print('caracteres no permitidos:',tmp3)
+		if tmp3!='': print('[!] ERROR: Existen caracteres NO PERMITIDOS> ',tmp3)
 
 		#verificamos capitalización
 		if params.get('capitalize',None)=='upper':
