@@ -17,6 +17,24 @@ def clear():
     else:
         os.system("clear")
 
+def consoleMsgBox(type,msg,enter=False):
+	#type = ok,error,alert
+	if type=='ok':
+		cs=Fore.BLACK+Back.GREEN
+		icon='[ok]'
+	elif type=='error':
+		cs=Fore.WHITE+Back.RED
+		icon='[!]'
+	elif type=='alert':
+		cs=Fore.BLACK+Back.YELLOW
+		icon='[A]'
+	else:
+		cs=''
+	print(cs+icon+' : '+msg+' '+Style.RESET_ALL)
+	if enter:
+		input()
+
+
 def isNumber(s):
 #
 # Descripción: Devuelve True si s es del object tipo int o float
@@ -547,7 +565,7 @@ def defragmentTable(database,table):
 def insertEmptyRow(database,table,id):
 	pass
 
-def exportCsv(database,table,filename):
+def exportCsv(database,table,filename='out.csv'):
 #
 # Descripción: exporta una tabla especificada a  un archivo delimitado por comas CSV
 # Entrada:
@@ -559,7 +577,26 @@ def exportCsv(database,table,filename):
 # Pendientes:
 #	validar si el archivo existe, número de registros cargados, etc
 #
+	con = lite.connect(database)
+	con.row_factory = lite.Row
+	cur = con.cursor()
+	sql='SELECT * FROM {}'.format(table)
+	cur.execute(sql)
+	rows = cur.fetchall()
+	con.close()
+
 	fic = open(filename, "w")
+	tmp=''
+	for c in rows[0].keys():
+		tmp+='"{}",'.format(c)
+	tmp=tmp[0:-1]+os.linesep
+	fic.write(tmp)
+	for row in rows:
+		tmp=''
+		for c in row:
+			tmp+='"{}",'.format(c)
+		tmp=tmp[0:-1]+os.linesep
+		fic.write(tmp)
 	fic.close()
 
 def importCsv(database,table,filename):

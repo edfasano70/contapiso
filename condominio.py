@@ -27,6 +27,9 @@ database='condominio.db3'
 table='locales'
 period='012020'
 
+exportCsv()
+input()
+
 with open('condominio.json') as file: views = json.load(file)
 
 def manejoTablas():
@@ -36,7 +39,7 @@ def manejoTablas():
 
 		if table=='gastos':
 			views[table]['sql']="SELECT id, locales_codigo as local, descripcion, precio, cantidad, precio*cantidad as subtotal FROM gastos WHERE mmyyyy='{}'".format(period)
-			views[table]['header']+='  PERIODO : {}'.format(period)
+			views[table]['header']='EDIFICIO GALERIAS MIRANDA\nTABLA: GASTOS <gastos en condominio.db3> PERIODO: {}/{}'.format(period[0:2],period[2:])
 
 		firstRow=True
 		for rl in renderTableAuto(views.get(table,{'database':database,'table':table})):
@@ -90,9 +93,11 @@ def manejoTablas():
 			if recordExist(database,table,'id',id):
 				deleteRow(database,table,'id',id)
 				defragmentTable(database,table)
-				print('[Ok] Operación exitosa. Registro BORRADO')
+				consoleMsgBox('ok','Operación exitosa. Registro BORRADO',False)
+				#print('[Ok] Operación exitosa. Registro BORRADO')
 			else:
-				print('[!] ERROR: Registro no existe')
+				consoleMsgBox('error','Registro no existe',False)
+				#print('[!] ERROR: Registro no existe')
 
 
 
@@ -117,13 +122,22 @@ while True:
 	tmp=input('>>> Seleccione > ')[0:1].upper()
 	if tmp=='1' or tmp=='T':
 		tmp=(tableList(database))
-		print('Tablas disponibles :',tmp)
-		tmp2=input('[?] Ingrese NOMBRE de la tabla > ')
-		if tmp2 in tmp:
-			table=tmp2
+		print('Tablas disponibles :')
+		i=1
+		for t in tmp:
+			try:
+				tmp2=views[tmp[i-1]]['caption']
+			except:
+				tmp2=tmp[i-1]
+			print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,tmp2))
+			i+=1
+		tmp2=input('>>> Seleccione > ')[0:1].upper()
+		try:
+			tmp2=int(tmp2)-1
+			table=tmp[tmp2]
 			manejoTablas()
-		else:
-			print('[!] ERROR: Valor introducido NO EXISTE')
+		except:
+			consoleMsgBox('error','Valor introducido NO EXISTE',True)
 
 	if tmp=='2' or tmp=='R':
 		if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))

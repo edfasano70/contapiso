@@ -27,6 +27,7 @@
     "locales":{
         "database":"condominio.db3",
         "table":"locales",
+        "caption":"LOCALES COMERCIALES",
         "sql":"SELECT id, codigo, piso, local, propietario, inquilino, alicuota, saldo FROM locales",
         "header":"EDIFICIO GALERIAS MIRANDA\nTABLA: LOCALES COMERCIALES <locales en condominio.db3>",
         "footer":"Fin de la tabla\n",
@@ -113,6 +114,7 @@
     "gastos":{
         "database":"condominio.db3",
         "table":"gastos",
+        "caption":"GASTOS DEL PERIODO",
         "sql":"SELECT id, mmyyyy, locales_codigo as local, descripcion, precio, cantidad, precio*cantidad as subtotal FROM gastos",
         "header":"EDIFICIO GALERIAS MIRANDA\nTABLA: GASTOS <gastos en condominio.db3>",
         "footer":"Fin de la tabla\n",
