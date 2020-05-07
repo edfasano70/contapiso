@@ -17,6 +17,24 @@ def clear():
     else:
         os.system("clear")
 
+def consoleMsgBox(type,msg,enter=False):
+	#type = ok,error,alert
+	if type=='ok':
+		cs=Fore.BLACK+Back.GREEN
+		icon='[ok]'
+	elif type=='error':
+		cs=Fore.WHITE+Back.RED
+		icon='[!]'
+	elif type=='alert':
+		cs=Fore.BLACK+Back.YELLOW
+		icon='[A]'
+	else:
+		cs=''
+	print(cs+icon+' : '+msg+' '+Style.RESET_ALL)
+	if enter:
+		input()
+
+
 def isNumber(s):
 #
 # Descripción: Devuelve True si s es del object tipo int o float
@@ -162,7 +180,7 @@ def renderTableAuto(params):
 #
 	database=params.get('database')
 	table=params.get('table')
-	header=params.get('header','DUMMY header')
+	#header=params.get('header','DUMMY header')
 	footer=params.get('footer','DUMMY footer')
 	sql=params.get('sql','SELECT * FROM {}'.format(table))
 
@@ -236,7 +254,7 @@ def renderTableAuto(params):
 					row[i]=row[i][colWidth[i]*(-1):]
 	max_width=0
 	t2=''
-	res=header+'\n'
+	res=''#header+'\n'
 	firstRow=True
 	output=[]
 	for row in data:
@@ -248,8 +266,8 @@ def renderTableAuto(params):
 		output.append(res)
 		if len(res)>max_width: max_width=len(res)
 	output.insert(1,'-'*(max_width-1))
-	output.insert(0,params.get('header','{} in {}'.format(table,database)))
-	output.insert(1,' '*(max_width-1))
+	#output.insert(0,params.get('header','{} in {}'.format(table,database)))
+	#output.insert(1,' '*(max_width-1))
 
 	output.append(' '*(max_width-1))
 	output.append(params.get('footer','EoT\n'))
@@ -547,7 +565,7 @@ def defragmentTable(database,table):
 def insertEmptyRow(database,table,id):
 	pass
 
-def exportCsv(database,table,filename):
+def exportCsv(database,table,filename='out.csv'):
 #
 # Descripción: exporta una tabla especificada a  un archivo delimitado por comas CSV
 # Entrada:
@@ -559,7 +577,26 @@ def exportCsv(database,table,filename):
 # Pendientes:
 #	validar si el archivo existe, número de registros cargados, etc
 #
+	con = lite.connect(database)
+	con.row_factory = lite.Row
+	cur = con.cursor()
+	sql='SELECT * FROM {}'.format(table)
+	cur.execute(sql)
+	rows = cur.fetchall()
+	con.close()
+
 	fic = open(filename, "w")
+	tmp=''
+	for c in rows[0].keys():
+		tmp+='"{}",'.format(c)
+	tmp=tmp[0:-1]+os.linesep
+	fic.write(tmp)
+	for row in rows:
+		tmp=''
+		for c in row:
+			tmp+='"{}",'.format(c)
+		tmp=tmp[0:-1]+os.linesep
+		fic.write(tmp)
 	fic.close()
 
 def importCsv(database,table,filename):

@@ -1,3 +1,9 @@
 Pendientes:
-usar modulo csv para la importación de datos
-crear función para mostrar alertas por consola tipo msgbox
+terminar con la implementacion de csv
+aplicar msgbox a todos los mensajes
+introducir validacion de numeros con minimo y maximo
+introducir validacion de fecha
+
+
+lidiar con el período
+aún queda el manejo de la modificación borrado  de registro para la tabla gastos
