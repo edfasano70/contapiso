@@ -6,4 +6,4 @@ introducir validacion de fecha
 
 
 lidiar con el período
-aún queda el manejo de la modificación borrado  de registro para la tabla gastos
+  aún queda el manejo de la creación, modificación y borrado de registro para la tabla gastos
