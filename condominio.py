@@ -2,18 +2,6 @@
 # -*- coding: utf-8 -*-
 # Programa de gestión de gastos de condominio
 
-# Pendientes:
-# 	Panda para importar, exportar a csv y excel
-#	arreglar lo de la modificación de datos
-#	menu principal 
-#		manejo de tablas
-#		seleccion de periodo
-#		reportes
-#		facturacion
-#		salir
-#	menu secundario
-#		arreglar lo de la entrada de comandos
-
 import json
 import condo
 from condo import *
@@ -21,7 +9,7 @@ import fpdf
 from fpdf import FPDF
 import yagmail
 
-con = None
+#con = None
 
 database='condominio.db3'
 table='locales'
@@ -46,20 +34,19 @@ def crearTablaPeriodo():
 		cur = con.cursor()
 		cur.execute(create_gastos_sql)
 		con.close()
-		print('se creó la tabla gastos_'+period)
+		consoleMsgBox('alert','Se creó la tabla gastos_'+period)
+		#print('se creó la tabla gastos_'+period)
 	else:
-		print('la tabla gastos_'+period+' ya existe!')
-	input()
+		pass
+	consoleMsgBox('ok','Cambio a período {}/{}'.format(period[0:2],period[2:]))
+	#print('la tabla gastos_'+period+' ya existe!')
+	#input()
 
 def manejoTablas():
 	global database,table,period,views
 	while True:
 		clear()
 
-		if table=='gastos':
-			#views[table]=views['gastos']
-			views[table]['sql']="SELECT id, locales_codigo as local, descripcion, precio, cantidad, precio*cantidad as subtotal FROM gastos_{}".format(period)
-			views[table]['header']='EDIFICIO GALERIAS MIRANDA\nTABLA: GASTOS <gastos en condominio.db3> PERIODO: {}/{}'.format(period[0:2],period[2:])
 
 		header=views.get(table,{}).get('header','{} in {}'.format(table,database))
 
@@ -86,13 +73,15 @@ def manejoTablas():
 		if opcion=='S':
 			break
 		elif opcion=='N':
-			data={}
-			data['id']=str(maxId(database,table,'id')+1)
+			#input('dentro')
+			data={'id':str(maxId(database,table,'id')+1)}
+			#print(table,data,views.get(table,{'database':database,'table':table}))
+			#input('dentro2')
 			if insertRow(database,table,data):
-				print('[Ok] Nuevo registro ingresado')
-				modificarRegistro('id',data['id'],views[table])
+				consoleMsgBox('ok','Nuevo registro ingresado',False)
+				modificarRegistro('id',data['id'],views.get(table,{'database':database,'table':table}))
 			else:
-				print('[!] ERROR: No se pudo ingresar el registro')
+				consoleMsgBox('error','No se pudo ingresar el registro')
 
 
 
@@ -114,9 +103,9 @@ def manejoTablas():
 			if recordExist(database,table,'id',id):
 				deleteRow(database,table,'id',id)
 				defragmentTable(database,table)
-				consoleMsgBox('ok','Operación exitosa. Registro BORRADO',False)
+				consoleMsgBox('ok','Operación exitosa. Registro id={} BORRADO'.format(id),False)
 			else:
-				consoleMsgBox('error','Registro no existe',False)
+				consoleMsgBox('error','Registro id={} no existe'.format(id),False)
 
 
 
@@ -158,20 +147,32 @@ while True:
 			print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,tmp2))
 			i+=1
 		tmp2=input('>>> Seleccione > ')[0:1].upper()
+		errorFlag=False
 		try:
 			tmp2=int(tmp2)-1
 			table=tmp[tmp2]
-			manejoTablas()
+		#	manejoTablas()
 		except:
+			errorFlag=True
+		#input(errorFlag)
+		if errorFlag:	
 		 	consoleMsgBox('error','Valor introducido NO EXISTE',True)
+		else:
+			if table=='gastos':
+				table='gastos_'+period
+				views[table]=views['gastos']
+				views[table]['sql']="SELECT id, locales_codigo as local, descripcion, precio, cantidad, precio*cantidad as subtotal FROM gastos_{}".format(period)
+				views[table]['header']='EDIFICIO GALERIAS MIRANDA\nTABLA: GASTOS <gastos en condominio.db3> PERIODO: {}/{}'.format(period[0:2],period[2:])
+				views[table]['table']=table
+			manejoTablas()
 
 	if tmp=='2' or tmp=='R':
 		if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
 	if tmp=='3' or tmp=='P':
-		month=input('Mes [MM] ? ')
-		year=input('Año [YYYY] ? ')
+		month=input('Mes [MM] ? ')[0:2]
+		year=input('Año [YYYY] ? ')[0:4]
 		period=month+year
-		print('período {}'.format(period))
+		#print('período {}'.format(period))
 		crearTablaPeriodo()
 		input()
 	if tmp=='4' or tmp=='I':

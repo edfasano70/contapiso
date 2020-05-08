@@ -193,85 +193,85 @@ def renderTableAuto(params):
 
 	#convertimos el resultado en una matriz
 	rows = list(rows)
-	data = []
-	keys = []
-	tmp2=[]
+	if rows!=[]:
 
-	for k in rows[0].keys():
-		keys.append(k)
-		try:
-			tmp2.append(params['columns'][k]['caption'])
-		except:
-			tmp2.append(k)
+		data = []
+		keys = []
+		tmp2=[]
 
-	#data.append(tmp)
-	data.append(tmp2)
+		for k in rows[0].keys():
+			keys.append(k)
+			try:
+				tmp2.append(params['columns'][k]['caption'])
+			except:
+				tmp2.append(k)
 
-	for r in rows:
-		tmp	= []
-		for k in r.values():
-			tmp.append(k)
-		data.append(tmp)
-	for row in data:
-		for i in range(0,len(row)):
-			if row[i]==None:
-				row[i]=''
-			if isNumber(row[i]): #si la columna es int o float lo convertimos a str formateado
-				try:
-					tmp=params['columns'][keys[i]]['decimal_places']    #style['decimalplaces'][i]
-				except:
-					tmp=2
-				#print(keys[i],tmp)
-				tmp='>{:,.'+str(tmp)+'f}'
-				row[i]=tmp.format(row[i])
-	#acá se obtiene el ancho máximo de las columnas
-	colWidth=[]
-	firstRow=True
-	for row in data:
-		if firstRow:
-			firstRow=False
+		data.append(tmp2)
+
+		for r in rows:
+			tmp	= []
+			for k in r.values():
+				tmp.append(k)
+			data.append(tmp)
+		for row in data:
 			for i in range(0,len(row)):
-				colWidth.append(len(row[i]))
-		else:
-			for i in range(0,len(row)):
-				if len(row[i])>colWidth[i]:
-					colWidth[i]=len(row[i])
-	#a continuación ponemos todas las celdas al máximo de ancho
-	firstRow=True
-	for row in data:
-		if firstRow:
-			firstRow=False
-			for i in range(0,len(row)):
-				tmp='{:^'+str(colWidth[i])+'}'
-				row[i]=tmp.format(row[i])
-		else:
-			for i in range(0,len(row)):
-				if row[i][0:1]!='>':
-					row[i]=row[i]+colWidth[i]*' '
-					row[i]=row[i][0:colWidth[i]]
-				else:
-					row[i]=colWidth[i]*' '+row[i][1:]
-					row[i]=row[i][colWidth[i]*(-1):]
-	max_width=0
-	t2=''
-	res=''#header+'\n'
-	firstRow=True
-	output=[]
-	for row in data:
+				if row[i]==None:
+					row[i]=''
+				if isNumber(row[i]): #si la columna es int o float lo convertimos a str formateado
+					try:
+						tmp=params['columns'][keys[i]]['decimal_places']    #style['decimalplaces'][i]
+					except:
+						tmp=2
+					#print(keys[i],tmp)
+					tmp='>{:,.'+str(tmp)+'f}'
+					row[i]=tmp.format(row[i])
+		#acá se obtiene el ancho máximo de las columnas
+		colWidth=[]
+		firstRow=True
+		for row in data:
+			if firstRow:
+				firstRow=False
+				for i in range(0,len(row)):
+					colWidth.append(len(row[i]))
+			else:
+				for i in range(0,len(row)):
+					if len(row[i])>colWidth[i]:
+						colWidth[i]=len(row[i])
+		#a continuación ponemos todas las celdas al máximo de ancho
+		firstRow=True
+		for row in data:
+			if firstRow:
+				firstRow=False
+				for i in range(0,len(row)):
+					tmp='{:^'+str(colWidth[i])+'}'
+					row[i]=tmp.format(row[i])
+			else:
+				for i in range(0,len(row)):
+					if row[i][0:1]!='>':
+						row[i]=row[i]+colWidth[i]*' '
+						row[i]=row[i][0:colWidth[i]]
+					else:
+						row[i]=colWidth[i]*' '+row[i][1:]
+						row[i]=row[i][colWidth[i]*(-1):]
+		max_width=0
 		t2=''
 		res=''
-		res+=t2+' '
-		for r in row:
-			res += r+' '
-		output.append(res)
-		if len(res)>max_width: max_width=len(res)
-	output.insert(1,'-'*(max_width-1))
-	#output.insert(0,params.get('header','{} in {}'.format(table,database)))
-	#output.insert(1,' '*(max_width-1))
+		firstRow=True
+		output=[]
+		for row in data:
+			t2=''
+			res=''
+			res+=t2+' '
+			for r in row:
+				res += r+' '
+			output.append(res)
+			if len(res)>max_width: max_width=len(res)
+		output.insert(1,'-'*(max_width-1))
+		output.append(' '*(max_width-1))
+		output.append(params.get('footer','EoT\n'))
+	else:
+		output=['La tabla está vacía...\n']
 
-	output.append(' '*(max_width-1))
-	output.append(params.get('footer','EoT\n'))
-	
 	return(output)
 
 
@@ -518,6 +518,7 @@ def maxId(database,table,id_name):
 	if con: con.close()
 	return int(res[0])
 
+
 def recordExist(database,table,id_name,id_value):
 #
 # Descripción: Verifica que un registro exista en una base de datos SQLite
@@ -531,12 +532,13 @@ def recordExist(database,table,id_name,id_value):
 #
 	res=False
 	con = lite.connect(database)
-	with con:
-		cur = con.cursor()
-		cur.execute('select count(id) from {} where {} = {}'.format(table,id_name,id_value))
-		if cur.fetchone()[0]>0:
-			res=True
-	if con: con.close()
+	cur = con.cursor()
+	sql='select count(id) from {} where {} = {}'.format(table,id_name,id_value)
+	#input(sql)
+	cur.execute(sql)
+	if cur.fetchone()[0]>0:
+		res=True
+	con.close()
 	return res
 
 def defragmentTable(database,table):
@@ -616,7 +618,7 @@ def importCsv(database,table,filename):
 	fic.close()
 	headerFlag=True
 	for line in lines:
-		line=line.replace('\'','').replace('\n','')#.split(',')
+		line=line.replace('\'','').replace('\n','')
 		if headerFlag:
 			headerFlag=False
 			keys=[]
@@ -650,15 +652,9 @@ def modificarRegistro(id_name,id_value,style):
 		row=getRow(database,table,id_name,id_value)
 		data={}
 		for c in row.keys():
-			try:
-				cStyle=style['columns'][c]
-			except:
-				cStyle={'type':'str'}
+			cStyle=style.get('columns',{}).get(c,{'type':'str'})
 			while True:
-				try:
-					caption=cStyle['caption']
-				except:
-					caption=c
+				caption=cStyle.get('caption',c)
 				helper=cStyle.get('helper','')
 
 				if row[c]==None: row[c]=''
@@ -666,7 +662,7 @@ def modificarRegistro(id_name,id_value,style):
 				if cStyle.get('enabled',True):
 					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
 				else:
-					print('{} :{}'.format(caption,row[c]))
+					print('{} : {}'.format(caption,row[c]))
 					data[c]=str(row[c])
 					break
 				if tmp=='': tmp=row[c]
@@ -676,20 +672,20 @@ def modificarRegistro(id_name,id_value,style):
 					data[c]=tmp 
 					break
 
-
-
 		updateRow(database,table,data)
-		print(Fore.BLACK+Back.GREEN+'[Ok] Registro actualizado'+Style.RESET_ALL)
+		consoleMsgBox('ok','Registro actualizado')
 	else:
-		print(Fore.BLACK+Back.RED+'[!] El registro id = {} no existe'.format(id_value)+Style.RESET_ALL)
+		consoleMsgBox('error','El registro id={} NO EXISTE'.format(id_value))
+
 
 def validateInput(value,params={'type':'str'}):
 	res=True
 	msg=''
 	type=params['type']
 	if type=='str':
+		value=str(value)
 		#verificamos los caracteres permitidos
-		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ '
 
 		tmp=value.upper()
 		tmp2=''
@@ -703,7 +699,7 @@ def validateInput(value,params={'type':'str'}):
 
 		value=tmp2
 
-		if tmp3!='': print('[!] ERROR: Existen caracteres NO PERMITIDOS> ',tmp3)
+		if tmp3!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> {}'.format(tmp3))
 
 		#verificamos capitalización
 		if params.get('capitalize',None)=='upper':
@@ -715,10 +711,10 @@ def validateInput(value,params={'type':'str'}):
 		#verificamos longitud minima y maxima
 		if len(value)<params.get('lenght_min',0):
 			res=False
-			msg+='[!] ERROR: Debe tener al menos {} caracteres\n'.format(params.get('lenght_min',0))
+			consoleMsgBox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
 		if len(value)>params.get('lenght_max',20):
 			value=value[0:params.get('lenght_max',20)]
-			msg+='[!] WARNING: Longitud supera la máxima de {} caracateres\n'.format(params.get('lenght_max',20))	
+			consoleMsgBox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
 
 	elif type=='int':
 		pass

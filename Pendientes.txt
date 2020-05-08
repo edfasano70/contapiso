@@ -5,5 +5,10 @@ introducir validacion de numeros con minimo y maximo
 introducir validacion de fecha
 
 
-lidiar con el período
-  aún queda el manejo de la creación, modificación y borrado de registro para la tabla gastos
+Panda para importar, exportar a csv y excel
+	ya la implementacion csv está lista excel para una proxima versión
+
+
+programa que tome una tabla y genere el json para visualizar esto también se puede implementar con los valores po defecto de las columnas y que compare con los valores de salida y que los guarde al cerrar
+
+archivo .ini el cual va a ser un json también

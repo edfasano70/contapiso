@@ -17,8 +17,10 @@
                 "lenght_max":100,
                 "lenght_min":0,
                 "capitalize":"upper, lower, capitalize, none",
-                "alowed_chars":"abcdefghijklmnopqrstuvwxyz0123456789.,",
+                "alowed_chars":"abcdefghijklmnopqrstuvwxyz0123456789., ",
                 "decimal_places":2,
+                "min":false,
+                "max":false,
                 "visible":true,
                 "enabled":true
             }
@@ -59,6 +61,7 @@
                 "caption":"PISO",
                 "helper":"Piso del local",
                 "type":"str",
+                "capitalize":"upper",
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true
@@ -66,7 +69,8 @@
             "local":{
                 "caption":"LOCAL",
                 "helper":"Local(es)",
-                "type":"",
+                "type":"str",
+                "capitalize":"upper",
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true
@@ -131,14 +135,6 @@
                 "visible":true,
                 "enabled":false
             },
-            "mmyyyy":{
-                "caption":"MM-YYYY",
-                "helper":"Período (MM-YYYY)",
-                "type":"str",
-                "decimal_places":0,
-                "visible":true,
-                "enabled":true
-            },
             "local":{
                 "caption":"LOCAL",
                 "helper":"Código del local al que se asigna el gasto",
@@ -151,6 +147,7 @@
                 "caption":"DESCRIPCION",
                 "helper":"Descripción del gasto",
                 "type":"str",
+                "capitalize":"upper",
                 "decimal_places":0,
                 "visible":true,
                 "enabled":true
@@ -159,6 +156,7 @@
                 "caption":"PRECIO(Bs)",
                 "helper":"Moto del gasto en Bs",
                 "type":"float",
+                "min":0,
                 "decimal_places":2,
                 "visible":true,
                 "enabled":true
@@ -167,6 +165,7 @@
                 "caption":"CANTIDAD",
                 "helper":"Cantidad",
                 "type":"float",
+                "min":0,
                 "decimal_places":2,
                 "visible":true,
                 "enabled":true
