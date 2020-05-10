@@ -1,5 +1,9 @@
 # modulo de rutinas del programa condominio
-
+import json
+import condo
+import fpdf
+from fpdf import FPDF
+import yagmail
 import sqlite3 as lite
 import sys
 import os
@@ -8,10 +12,7 @@ from colorama import *
 colorama.init(autoreset=True)
 
 def clear():
-#
-# Descripción: Borra la consola
-#
-    import os
+	Descripcion='''Borra la consola'''
     if os.name == "nt":
         os.system("cls")
     else:
@@ -165,25 +166,21 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 
 
 def renderTableAuto(params):
-#
-# Descripción: Genera el código para imprimir una tabla
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	style    - dict   - tiene todos los parámetros que dibujan la tabla
-#	output	 - string - puede ser console, str, html
-# Regresa:
-#	string	-	con todo el codigo para mostrar la tabla
-# Pendiente:
-# 	opción html
-# 	eliminar la versión vieja
-#
+	Descripcion='''
+	Genera el código para imprimir una tabla
+ 	Entrada:
+		database - string - nombre de la base de datos
+		table    - string - nombre de la tabla
+		style    - dict   - tiene todos los parámetros que dibujan la tabla
+		output	 - string - puede ser console, str, html
+ 	Regresa:
+		string	-	con todo el codigo para mostrar la tabla
+ 	Pendiente:
+ 		opción html
+ 	'''
 	database=params.get('database')
 	table=params.get('table')
-	#header=params.get('header','DUMMY header')
-	footer=params.get('footer','DUMMY footer')
 	sql=params.get('sql','SELECT * FROM {}'.format(table))
-
 	con = lite.connect(database)
 	con.row_factory = dict_factory
 	cur = con.cursor()
@@ -267,8 +264,6 @@ def renderTableAuto(params):
 			output.append(res)
 			if len(res)>max_width: max_width=len(res)
 		output.insert(1,'-'*(max_width-1))
-		output.append(' '*(max_width-1))
-		output.append(params.get('footer','EoT\n'))
 	else:
 		output=['La tabla está vacía...\n']
 
@@ -345,13 +340,33 @@ def getRow(database,table,id_name,id_value):
 #
 	con = lite.connect(database)
 	con.row_factory = lite.Row #
-	with con:
-		cur = con.cursor()
-		cur.execute('SELECT * FROM {0} WHERE {1} = {2}'.format(table,id_name,id_value))
-		row = cur.fetchone()
-		row=dict(zip(row.keys(), row)) #
-	if con: con.close()
+	cur = con.cursor()
+	cur.execute('SELECT * FROM {0} WHERE {1} = {2}'.format(table,id_name,id_value))
+	row = cur.fetchone()
+	row=dict(zip(row.keys(), row)) #
+	con.close()
 	return row
+
+def getRowSql(database,sql):
+#
+# Descripción: Obtiene una línea de datos de una base de datos SQLite
+# Entrada:
+#	database - string - nombre de la base de datos
+#	table    - string - nombre de la tabla
+#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
+#	id_value - string - valor a buscar
+# Regresa:
+#	dict - valores retornados
+#
+	con = lite.connect(database)
+	con.row_factory = lite.Row #
+	cur = con.cursor()
+	cur.execute(sql)
+	row = cur.fetchone()
+	row=dict(zip(row.keys(), row)) #
+	con.close()
+	return row
+
 
 def getTable(database,table):
 #
@@ -371,18 +386,13 @@ def getTable(database,table):
 	return rows
 
 def tableList(database):
-#
-# Descripción: Obtiene una línea de datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-#	id_value - string - valor a buscar
-# Regresa:
-#	tuple - valores retornados
-#
+	Descripcion=''' Obtiene una línea de datos de una base de datos SQLite
+	Entrada:
+		database - string - nombre de la base de datos
+	Regresa:
+		tuple - valores retornados
+	'''
 	con = lite.connect(database)
-	#con.row_factory = lite.Row #
 	cur = con.cursor()
 	cur.execute("select name from sqlite_master where type='table' and name!='sqlite_sequence'")
 	res=[]
@@ -395,15 +405,15 @@ def tableList(database):
 	return res
 
 def insertRow(database,table,data):
-#
-# Descripción: Inserta una línea de datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	data     - dict   - datos en forma de pares key-value
-# Regresa:
-#	bool - True si se ingresó el dato correctamente
-#
+	Descripcion='''
+	Inserta una línea de datos de una base de datos SQLite
+	Entrada:
+		database - string - nombre de la base de datos
+		table    - string - nombre de la tabla
+		data     - dict   - datos en forma de pares key-value
+	Regresa:
+		bool - True si se ingresó el dato correctamente
+	'''
 	res = True
 	keys=data.keys()
 	tmp=''
@@ -416,15 +426,14 @@ def insertRow(database,table,data):
 		tmp+="'"+str(v)+"',"
 	data=tmp[0:len(tmp)-1]
 	con = lite.connect(database)
-	with con:
-		cur = con.cursor()
-		try:
-			sql='INSERT INTO {} ({}) VALUES ({})'.format(table,keys,data)
-			cur.execute(sql)
-			con.commit()
-		except:
-		 	res = False
-	if con: con.close()
+	cur = con.cursor()
+	sql='INSERT INTO {} ({}) VALUES ({})'.format(table,keys,data)
+	try:
+		cur.execute(sql)
+		con.commit()
+	except:
+	 	res = False
+	con.close()
 	return res
 
 def changeRowId(database,table,old_id,new_id): #REVISAR
@@ -635,16 +644,16 @@ def importCsv(database,table,filename):
 			insertRow(database,table,data)
 
 def modificarRegistro(id_name,id_value,style):
-#
-# Descripción: modifica un registro preguntando valores
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	id_name  - string - nombre de la columna apuntador normalmente 'id'
-#	id_value - string - valor a modificar
-# Regresa:
-# 	DEBERIA regresar bool - True si se modificó
-#
+	Descripcion='''
+	Modifica un registro preguntando valores
+	Entrada:
+		database - string - nombre de la base de datos
+		table    - string - nombre de la tabla
+		id_name  - string - nombre de la columna apuntador normalmente 'id'
+		id_value - string - valor a modificar
+	Regresa:
+		DEBERIA regresar bool - True si se modificó
+	'''
 	database=style['database']
 	table=style['table']
 
@@ -709,12 +718,14 @@ def validateInput(value,params={'type':'str'}):
 		elif params.get('capitalize',None)=='capitalize':
 			value=value.capitalize()
 		#verificamos longitud minima y maxima
-		if len(value)<params.get('lenght_min',0):
-			res=False
-			consoleMsgBox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
-		if len(value)>params.get('lenght_max',20):
-			value=value[0:params.get('lenght_max',20)]
-			consoleMsgBox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
+		if params.get('lenght_min',0)!=None:
+			if len(value)<params.get('lenght_min',0):
+				res=False
+				consoleMsgBox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
+		if params.get('lenght_max',100)!=None:
+			if len(value)>params.get('lenght_max',100):
+				value=value[0:params.get('lenght_max',100)]
+				consoleMsgBox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
 
 	elif type=='int':
 		pass

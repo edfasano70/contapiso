@@ -2,64 +2,53 @@
 # -*- coding: utf-8 -*-
 # Programa de gestión de gastos de condominio
 
-import json
-import condo
 from condo import *
-import fpdf
-from fpdf import FPDF
-import yagmail
 
-#con = None
-
+iniFile='condominio.json'
 database='condominio.db3'
 table='locales'
-period='052020'
-
-#exportCsv()
-#input()
+period='012020'
 
 def crearTablaPeriodo():
 	global database,period
 	if 'gastos_'+period not in tableList(database):
 
-		create_gastos_sql="CREATE TABLE gastos_{} ( \
+		create_gastos_sql="CREATE TABLE gastos{} ( \
 		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
 		    locales_codigo VARCHAR( 10 ),\
 		    documento      VARCHAR( 80 ),\
 		    descripcion    VARCHAR( 80 ),\
 		    precio         REAL           DEFAULT ( 0.0 ),\
-		    cantidad       REAL           DEFAULT ( 0.0 ));".format(period)
+		    cantidad       REAL           DEFAULT ( 0.0 ));".format('_'+period)
 
 		con = lite.connect(database)
 		cur = con.cursor()
 		cur.execute(create_gastos_sql)
 		con.close()
 		consoleMsgBox('alert','Se creó la tabla gastos_'+period)
-		#print('se creó la tabla gastos_'+period)
 	else:
 		pass
 	consoleMsgBox('ok','Cambio a período {}/{}'.format(period[0:2],period[2:]))
-	#print('la tabla gastos_'+period+' ya existe!')
-	#input()
 
 def manejoTablas():
 	global database,table,period,views
 	while True:
 		clear()
 
-
-		header=views.get(table,{}).get('header','{} in {}'.format(table,database))
-
+		header=views[table].get('header','')
+		header+='<{} in {}>'.format(table,database)
+		print(header+'\n')
 
 		firstRow=True
-
-		print(header+'\n')
-		for rl in renderTableAuto(views.get(table,{'database':database,'table':table})):
+		for rl in renderTableAuto(views[table]):
 			if firstRow: 
 				print(Style.BRIGHT+rl+Style.RESET_ALL)
 				firstRow=False
 			else:
 				print(rl+Style.RESET_ALL)
+
+		print('\n'+views[table].get('footer','EoT\n'))
+
 
 		tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar {0}S{1}alir > '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
 		
@@ -72,18 +61,16 @@ def manejoTablas():
 
 		if opcion=='S':
 			break
+
 		elif opcion=='N':
-			#input('dentro')
+			print(database,table)
+			input()
 			data={'id':str(maxId(database,table,'id')+1)}
-			#print(table,data,views.get(table,{'database':database,'table':table}))
-			#input('dentro2')
 			if insertRow(database,table,data):
 				consoleMsgBox('ok','Nuevo registro ingresado',False)
 				modificarRegistro('id',data['id'],views.get(table,{'database':database,'table':table}))
 			else:
 				consoleMsgBox('error','No se pudo ingresar el registro')
-
-
 
 
 		elif opcion=='M':
@@ -108,14 +95,92 @@ def manejoTablas():
 				consoleMsgBox('error','Registro id={} no existe'.format(id),False)
 
 
-
 		else:
 			print('[!] Opción no válida. H para ayuda')
 		input('Pulse ENTER para continuar...')
 
 	clear()
 
-with open('condominio.json') as file: views = json.load(file)
+def validateViews():
+	global database,view
+	tmp=(tableList(database))
+
+	if 'gastos' not in tmp:
+		create_gastos_sql="CREATE TABLE gastos ( \
+		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
+		    locales_codigo VARCHAR( 10 ),\
+		    documento      VARCHAR( 80 ),\
+		    descripcion    VARCHAR( 80 ),\
+		    precio         REAL           DEFAULT ( 0.0 ),\
+		    cantidad       REAL           DEFAULT ( 0.0 ));"
+
+		con = lite.connect(database)
+		cur = con.cursor()
+		cur.execute(create_gastos_sql)
+		con.close()
+
+		insertRow(database,'gastos',{'id':1})
+
+		tmp.append('gastos')
+
+	tmp2=[]
+	for t in tmp:
+		if 'gastos_' not in t:
+			tmp2.append(t)
+	tmp=tmp2 
+
+	for t in tmp:
+
+		if views.get(t,False)==False:
+			views[t]={}
+
+		views[t]['database']=views[t].get('database',database)
+		views[t]['table']=views[t].get('table',t)
+		views[t]['caption']=views[t].get('caption',t)
+		views[t]['sql']=views[t].get('sql','SELECT * FROM {}'.format(t))
+		views[t]['header']=views[t].get('header','')
+		views[t]['footer']=views[t].get('footer','')
+		views[t]['columns']=views[t].get('columns',{})
+
+		columns=[]
+		for c in getRow(views[t]['database'],views[t]['table'],'id',1).keys():
+			columns.append(c)
+		for c in getRowSql(views[t]['database'],views[t]['sql']).keys():
+			if c not in columns:
+				columns.append(c)
+		for c in columns:
+			if views[t]['columns'].get(c,False)==False:
+				views[t]['columns'][c]={"type":"str"}
+
+			views[t]['columns'][c]['caption']=views[t]['columns'][c].get('caption',c)
+			views[t]['columns'][c]['helper']=views[t]['columns'][c].get('helper',c)
+			
+			if views[t]['columns'][c].get('type','str')=='str':
+				views[t]['columns'][c]['capitalize']=views[t]['columns'][c].get('capitalize',None)
+				views[t]['columns'][c]['lenght_min']=views[t]['columns'][c].get('lenght_min',None)
+				views[t]['columns'][c]['lenght_max']=views[t]['columns'][c].get('lenght_max',None)
+				views[t]['columns'][c]['allowedChars']=views[t]['columns'][c].get('allowedChars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+
+			if views[t]['columns'][c].get('type','str')=='int':
+				views[t]['columns'][c]['decimal_places']=0
+				views[t]['columns'][c]['min']=views[t]['columns'][c].get('min',None)
+				views[t]['columns'][c]['max']=views[t]['columns'][c].get('max',None)
+
+			if views[t]['columns'][c].get('type','str')=='float':
+				views[t]['columns'][c]['decimal_places']=2
+				views[t]['columns'][c]['min']=views[t]['columns'][c].get('min',None)
+				views[t]['columns'][c]['max']=views[t]['columns'][c].get('max',None)
+
+			views[t]['columns'][c]['visible']=views[t]['columns'][c].get('visible',True)
+			views[t]['columns'][c]['enabled']=views[t]['columns'][c].get('enabled',True)
+
+try:
+	with open(iniFile) as file: views = json.load(file)
+except:
+	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
+	views={}
+
+validateViews()
 
 while True:
 	clear()
@@ -135,15 +200,11 @@ while True:
 			if 'gastos_' not in t:
 				tmp2.append(t)
 		tmp=tmp2
-		tmp.append('gastos')
 
 		print('Tablas disponibles :')
 		i=1
 		for t in tmp:
-			try:
-				tmp2=views[tmp[i-1]]['caption']
-			except:
-				tmp2=tmp[i-1]
+			tmp2=views[t]['caption']
 			print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,tmp2))
 			i+=1
 		tmp2=input('>>> Seleccione > ')[0:1].upper()
@@ -151,20 +212,20 @@ while True:
 		try:
 			tmp2=int(tmp2)-1
 			table=tmp[tmp2]
-		#	manejoTablas()
 		except:
 			errorFlag=True
-		#input(errorFlag)
 		if errorFlag:	
 		 	consoleMsgBox('error','Valor introducido NO EXISTE',True)
 		else:
 			if table=='gastos':
 				table='gastos_'+period
 				views[table]=views['gastos']
-				views[table]['sql']="SELECT id, locales_codigo as local, descripcion, precio, cantidad, precio*cantidad as subtotal FROM gastos_{}".format(period)
-				views[table]['header']='EDIFICIO GALERIAS MIRANDA\nTABLA: GASTOS <gastos en condominio.db3> PERIODO: {}/{}'.format(period[0:2],period[2:])
+				views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
+				views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
 				views[table]['table']=table
 			manejoTablas()
+			if table[0:6]=='gastos':
+				views.pop(table)
 
 	if tmp=='2' or tmp=='R':
 		if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
@@ -172,7 +233,6 @@ while True:
 		month=input('Mes [MM] ? ')[0:2]
 		year=input('Año [YYYY] ? ')[0:4]
 		period=month+year
-		#print('período {}'.format(period))
 		crearTablaPeriodo()
 		input()
 	if tmp=='4' or tmp=='I':
@@ -185,4 +245,9 @@ while True:
 
 
 clear()
+
+fic = open(iniFile, "w")
+fic.write(json.dumps(views,indent=4))
+fic.close()
+
 sys.exit()
