@@ -9,6 +9,8 @@ import sys
 import os
 import colorama
 from colorama import *
+import cfonts
+from cfonts import render, say
 colorama.init(autoreset=True)
 
 def clear():

@@ -8,6 +8,7 @@ iniFile='condominio.json'
 database='condominio.db3'
 table='locales'
 period='012020'
+version='0.1 alpha'
 
 def tableSelector():
 	global database,views
@@ -227,7 +228,21 @@ validateViews()
 
 while True:
 	clear()
-	print('MENU')
+	say(
+		'KaiKei',
+		font="slick",
+		align='left'
+	)
+	say(
+        'GESTION DE CONDOMINIO ver. {}'.format(version),
+        space=False,
+        font="console",
+        colors=["black"],
+        background="white",
+        align="left"
+    )
+	#print('GESTION DE CONDOMINIO ver. {}\n'.format(version))
+	print('\nMENU')
 	print('====')
 	print('{0}1) T{1}ablas'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
 	print('{0}2) R{1}eportes'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))

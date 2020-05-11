@@ -2,6 +2,7 @@ Pendientes:
 terminar con la implementacion de csv *** falta importación
 introducir validacion de numeros con minimo y maximo
 introducir validacion de fecha
-determinar si hay cambios en el descriptorio json y guardarlos...
+determinar si hay cambios en el descriptorio json y guardarlos... *** falta guardar un respaldo
 
-Panda para importar, exportar a csv y excel
+para otras versiones:
+Panda para importar, exportar a excel
