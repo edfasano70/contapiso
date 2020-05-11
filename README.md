@@ -1,5 +1,5 @@
-# KaiKey Condominio
-Programa en Python para la administración de condominios: <br>
+# KaiKei Condominio
+Programa simple desarrollado en Python para la administración de condominios: <br>
 	Python 3.6+<br>
 	Base de datos SQLite<br>
 	Multiplataforma<br>
