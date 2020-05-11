@@ -13,10 +13,10 @@ colorama.init(autoreset=True)
 
 def clear():
 	Descripcion='''Borra la consola'''
-    if os.name == "nt":
-        os.system("cls")
-    else:
-        os.system("clear")
+	if os.name == "nt":
+		os.system("cls")
+	else:
+		os.system("clear")
 
 def consoleMsgBox(type,msg,enter=False):
 	#type = ok,error,alert

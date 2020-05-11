@@ -2,13 +2,13 @@
     "libro": {
         "database": "condominio.db3",
         "table": "libro",
-        "caption": "libro",
+        "caption": "LIBRO MAYOR",
         "sql": "SELECT * FROM libro",
-        "header": "",
+        "header": "LIBRO MAYOR ",
         "footer": "",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -16,7 +16,10 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "tipo": {
                 "type": "str",
@@ -63,39 +66,45 @@
                 "enabled": true
             },
             "debe": {
-                "type": "str",
-                "caption": "debe",
+                "type": "float",
+                "caption": "DEBE(Bs)",
                 "helper": "debe",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             },
             "haber": {
-                "type": "str",
-                "caption": "haber",
+                "type": "float",
+                "caption": "HABER(Bs)",
                 "helper": "haber",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             }
         }
     },
     "locales": {
         "database": "condominio.db3",
         "table": "locales",
-        "caption": "locales",
+        "caption": "LOCALES COMERCIALES",
         "sql": "SELECT * FROM locales",
-        "header": "",
+        "header": "DATOS DE LOS LOCALES COMERCIALES ",
         "footer": "",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -103,11 +112,14 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "codigo": {
                 "type": "str",
-                "caption": "codigo",
+                "caption": "CODIGO",
                 "helper": "codigo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -118,7 +130,7 @@
             },
             "piso": {
                 "type": "str",
-                "caption": "piso",
+                "caption": "PISO",
                 "helper": "piso",
                 "capitalize": null,
                 "lenght_min": null,
@@ -129,7 +141,7 @@
             },
             "local": {
                 "type": "str",
-                "caption": "local",
+                "caption": "LOCAL(ES)",
                 "helper": "local",
                 "capitalize": null,
                 "lenght_min": null,
@@ -140,7 +152,7 @@
             },
             "propietario": {
                 "type": "str",
-                "caption": "propietario",
+                "caption": "PROPIETARIO(S)",
                 "helper": "propietario",
                 "capitalize": null,
                 "lenght_min": null,
@@ -151,7 +163,7 @@
             },
             "inquilino": {
                 "type": "str",
-                "caption": "inquilino",
+                "caption": "INQUILINO(S)",
                 "helper": "inquilino",
                 "capitalize": null,
                 "lenght_min": null,
@@ -161,30 +173,36 @@
                 "enabled": true
             },
             "alicuota": {
-                "type": "str",
-                "caption": "alicuota",
+                "type": "float",
+                "caption": "ALICUOTA(%)",
                 "helper": "alicuota",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             },
             "saldo": {
-                "type": "str",
-                "caption": "saldo",
+                "type": "float",
+                "caption": "SALDO(Bs)",
                 "helper": "saldo",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             },
             "contacto_nombre": {
                 "type": "str",
-                "caption": "contacto_nombre",
+                "caption": "PERSONA CONTACTO",
                 "helper": "contacto_nombre",
                 "capitalize": null,
                 "lenght_min": null,
@@ -195,7 +213,7 @@
             },
             "contacto_tlf": {
                 "type": "str",
-                "caption": "contacto_tlf",
+                "caption": "TELEFONO",
                 "helper": "contacto_tlf",
                 "capitalize": null,
                 "lenght_min": null,
@@ -206,7 +224,7 @@
             },
             "contacto_email": {
                 "type": "str",
-                "caption": "contacto_email",
+                "caption": "EMAIL",
                 "helper": "contacto_email",
                 "capitalize": null,
                 "lenght_min": null,
@@ -220,13 +238,13 @@
     "gastos": {
         "database": "condominio.db3",
         "table": "gastos",
-        "caption": "gastos",
-        "sql": "SELECT * FROM gastos",
-        "header": "",
+        "caption": "GASTOS DEL PERIODO",
+        "sql": "SELECT id, locales_codigo,documento,descripcion,precio,cantidad, precio*cantidad AS subtotal FROM gastos",
+        "header": "GASTOS DEL PERIODO ",
         "footer": "",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -234,11 +252,14 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "locales_codigo": {
                 "type": "str",
-                "caption": "locales_codigo",
+                "caption": "COD_LOCAL",
                 "helper": "locales_codigo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -249,7 +270,7 @@
             },
             "documento": {
                 "type": "str",
-                "caption": "documento",
+                "caption": "#DOC",
                 "helper": "documento",
                 "capitalize": null,
                 "lenght_min": null,
@@ -260,7 +281,7 @@
             },
             "descripcion": {
                 "type": "str",
-                "caption": "descripcion",
+                "caption": "DESCRIPCION",
                 "helper": "descripcion",
                 "capitalize": null,
                 "lenght_min": null,
@@ -271,7 +292,7 @@
             },
             "precio": {
                 "type": "float",
-                "caption": "precio",
+                "caption": "PRECIO(Bs)",
                 "helper": "precio",
                 "capitalize": null,
                 "lenght_min": null,
@@ -284,8 +305,8 @@
                 "max": null
             },
             "cantidad": {
-                "type": "int",
-                "caption": "cantidad",
+                "type": "float",
+                "caption": "CANTIDAD",
                 "helper": "cantidad",
                 "capitalize": null,
                 "lenght_min": null,
@@ -293,7 +314,21 @@
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
                 "enabled": true,
-                "decimal_places": 0,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
+            },
+            "subtotal": {
+                "type": "float",
+                "caption": "SUBTOTAL(Bs)",
+                "helper": "subtotal",
+                "capitalize": null,
+                "lenght_min": null,
+                "lenght_max": null,
+                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "visible": true,
+                "enabled": true,
+                "decimal_places": 2,
                 "min": null,
                 "max": null
             }

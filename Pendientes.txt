@@ -1,11 +1,7 @@
 Pendientes:
-terminar con la implementacion de csv
+terminar con la implementacion de csv *** falta importación
 introducir validacion de numeros con minimo y maximo
 introducir validacion de fecha
+determinar si hay cambios en el descriptorio json y guardarlos...
 
 Panda para importar, exportar a csv y excel
-	ya la implementacion csv está lista excel para una proxima versión
-
-verificar que el programa de validación de jason tome la data y el resultado del sql
-
-archivo .ini el cual va a ser un json también

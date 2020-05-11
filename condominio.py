@@ -9,6 +9,41 @@ database='condominio.db3'
 table='locales'
 period='012020'
 
+def tableSelector():
+	global database,views
+	flag=False
+	tablas=[]
+	for t in tableList(database):
+		if 'gastos' not in t:
+			tablas.append(t)
+		else:
+			if flag==False:
+				flag=True
+				tablas.append('gastos')
+
+	print('Tablas disponibles :')
+	i=1
+	for t in tablas:
+		print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,views[t].get('caption',t)))
+		i+=1
+	tmp=input('>>> Seleccione > ')
+	try:
+		tmp=int(tmp)-1
+		if tmp<0:tmp=None
+		res=tablas[tmp]
+	except:
+		res=None
+
+	return res
+
+def removeDictionaryKey(d,k): #trabaja directamente sobre el diccionario
+	if d.get(k,False):
+		d.pop(k)
+
+def assignValue2Key(d,k,v=None): #asigna el valor por defecto a una key en un dict sin importar si existe
+    if d.get(k,None)==None:
+    	d[k]=v
+
 def crearTablaPeriodo():
 	global database,period
 	if 'gastos_'+period not in tableList(database):
@@ -130,55 +165,63 @@ def validateViews():
 	tmp=tmp2 
 
 	for t in tmp:
+		assignValue2Key(views,t,{})
 
-		if views.get(t,False)==False:
-			views[t]={}
-
-		views[t]['database']=views[t].get('database',database)
-		views[t]['table']=views[t].get('table',t)
-		views[t]['caption']=views[t].get('caption',t)
-		views[t]['sql']=views[t].get('sql','SELECT * FROM {}'.format(t))
-		views[t]['header']=views[t].get('header','')
-		views[t]['footer']=views[t].get('footer','')
-		views[t]['columns']=views[t].get('columns',{})
+		vt=views[t]
+		assignValue2Key(vt,'database',database)
+		assignValue2Key(vt,'table',t)
+		assignValue2Key(vt,'caption',t)
+		assignValue2Key(vt,'sql','SELECT * FROM {}'.format(t))
+		assignValue2Key(vt,'header','')
+		assignValue2Key(vt,'footer','')
+		assignValue2Key(vt,'columns',{})
 
 		columns=[]
-		for c in getRow(views[t]['database'],views[t]['table'],'id',1).keys():
+		for c in getRow(vt.get('database'),vt.get('table'),'id',1).keys():
 			columns.append(c)
-		for c in getRowSql(views[t]['database'],views[t]['sql']).keys():
+		for c in getRowSql(vt.get('database'),vt.get('sql')).keys():
 			if c not in columns:
 				columns.append(c)
+
+		vt_c=vt['columns']
+
 		for c in columns:
-			if views[t]['columns'].get(c,False)==False:
-				views[t]['columns'][c]={"type":"str"}
+			assignValue2Key(vt_c,c,{'type':'str'})
 
-			views[t]['columns'][c]['caption']=views[t]['columns'][c].get('caption',c)
-			views[t]['columns'][c]['helper']=views[t]['columns'][c].get('helper',c)
+			vt_c2=vt_c[c]
+			assignValue2Key(vt_c2,'caption',c)
+			assignValue2Key(vt_c2,'helper',c)
 			
-			if views[t]['columns'][c].get('type','str')=='str':
-				views[t]['columns'][c]['capitalize']=views[t]['columns'][c].get('capitalize',None)
-				views[t]['columns'][c]['lenght_min']=views[t]['columns'][c].get('lenght_min',None)
-				views[t]['columns'][c]['lenght_max']=views[t]['columns'][c].get('lenght_max',None)
-				views[t]['columns'][c]['allowedChars']=views[t]['columns'][c].get('allowedChars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+			if vt_c2['type']=='str':
+				assignValue2Key(vt_c2,'capitalize')
+				assignValue2Key(vt_c2,'lenght_min')
+				assignValue2Key(vt_c2,'lenght_max')
+				assignValue2Key(vt_c2,'allowedChars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
 
-			if views[t]['columns'][c].get('type','str')=='int':
-				views[t]['columns'][c]['decimal_places']=0
-				views[t]['columns'][c]['min']=views[t]['columns'][c].get('min',None)
-				views[t]['columns'][c]['max']=views[t]['columns'][c].get('max',None)
+			elif vt_c2['type']=='int':
+				assignValue2Key(vt_c2,'decimal_places',0)
+				assignValue2Key(vt_c2,'min')
+				assignValue2Key(vt_c2,'max')
 
-			if views[t]['columns'][c].get('type','str')=='float':
-				views[t]['columns'][c]['decimal_places']=2
-				views[t]['columns'][c]['min']=views[t]['columns'][c].get('min',None)
-				views[t]['columns'][c]['max']=views[t]['columns'][c].get('max',None)
+			elif vt_c2['type']=='float':
+				assignValue2Key(vt_c2,'decimal_places',2)
+				assignValue2Key(vt_c2,'min')
+				assignValue2Key(vt_c2,'max')
 
-			views[t]['columns'][c]['visible']=views[t]['columns'][c].get('visible',True)
-			views[t]['columns'][c]['enabled']=views[t]['columns'][c].get('enabled',True)
+			assignValue2Key(vt_c2,'visible',True)
+			assignValue2Key(vt_c2,'enabled',True)
+
+
+
+
 
 try:
 	with open(iniFile) as file: views = json.load(file)
 except:
 	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
 	views={}
+
+viewOld=views.copy()
 
 validateViews()
 
@@ -194,32 +237,14 @@ while True:
 	print('{0}0) S{1}alir'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
 	tmp=input('>>> Seleccione > ')[0:1].upper()
 	if tmp=='1' or tmp=='T':
-		tmp=(tableList(database))
-		tmp2=[]
-		for t in tmp:
-			if 'gastos_' not in t:
-				tmp2.append(t)
-		tmp=tmp2
-
-		print('Tablas disponibles :')
-		i=1
-		for t in tmp:
-			tmp2=views[t]['caption']
-			print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,tmp2))
-			i+=1
-		tmp2=input('>>> Seleccione > ')[0:1].upper()
-		errorFlag=False
-		try:
-			tmp2=int(tmp2)-1
-			table=tmp[tmp2]
-		except:
-			errorFlag=True
-		if errorFlag:	
-		 	consoleMsgBox('error','Valor introducido NO EXISTE',True)
+		sel=tableSelector()
+		if sel==None:
+			consoleMsgBox('error','Valor NO ES VALIDO',True)
 		else:
+			table=sel
 			if table=='gastos':
 				table='gastos_'+period
-				views[table]=views['gastos']
+				views[table]=views['gastos'].copy()
 				views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
 				views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
 				views[table]['table']=table
@@ -229,25 +254,53 @@ while True:
 
 	if tmp=='2' or tmp=='R':
 		if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
+
 	if tmp=='3' or tmp=='P':
 		month=input('Mes [MM] ? ')[0:2]
 		year=input('Año [YYYY] ? ')[0:4]
 		period=month+year
 		crearTablaPeriodo()
 		input()
+
 	if tmp=='4' or tmp=='I':
 		filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
 		importCsv(database,table,filename)
+
 	if tmp=='5' or tmp=='E':
-		pass
+		sel=tableSelector()
+		if sel==None:
+			consoleMsgBox('error','Valor NO ES VALIDO',True)
+		else:
+			table=sel
+			if table=='gastos':
+				table='gastos_'+period
+				views[table]=views['gastos'].copy()
+				views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
+				views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
+				views[table]['table']=table
+			filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
+
+			if filename!='': exportCsv(database,table,filename+'.csv')
+
+			if table[0:6]=='gastos':
+				views.pop(table)
+
 	if tmp=='0' or tmp=='S':
 		break
 
-
 clear()
 
-fic = open(iniFile, "w")
-fic.write(json.dumps(views,indent=4))
-fic.close()
+
+if views==viewOld:
+	consoleMsgBox('ok','SIN cambios en archivo Json')
+else:
+	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
+	fic = open(iniFile, "w")
+	fic.write(json.dumps(views,indent=4))
+	fic.close()
+
+print('bye!\n')
 
 sys.exit()
+
+
