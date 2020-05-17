@@ -217,19 +217,23 @@ def validateViews():
 			assignValue2Key(vt_c2,'visible',True)
 			assignValue2Key(vt_c2,'enabled',True)
 
-def consoleMenu(title,params):
+def consoleMenu(title,options,exitOption='Salir',nullExit=False):
 	res=False
 	while True:
 		i=0
 		print('\n'+title)
 		print('-'*len(title))
-		for p in params:
+		for p in options:
 			i+=1
 			print(i,'·',p[0])
-		print(0,'· salir')
+		print(0,'· '+exitOption)
 		error=False
 		sel=input('\n>> ')
-		if sel=='':sel=i+1
+		if sel=='':
+			if nullExit:
+				sel=0
+			else:
+				sel=i+1
 		try:
 			sel=int(sel)
 		except:
@@ -240,7 +244,7 @@ def consoleMenu(title,params):
 		elif sel>i or error==True:
 			consoleMsgBox('error','Valor NO ES VALIDO',True)
 		else:
-			eval(params[sel-1][1])
+			eval(options[sel-1][1])
 		break
 	return res
 
