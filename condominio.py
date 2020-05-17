@@ -4,13 +4,16 @@
 
 from condo import *
 
-iniFile='condominio.json'
-database='condominio.db3'
+INIFILE='condominio.json'
+DATABASE='condominio.db3'
+VERSION='0.1 alpha'
+
+iniFile=INIFILE
+database=DATABASE
 table='locales'
 period='012020'
-version='0.1 alpha'
 
-def tableSelector():
+def tableSelector(): #hay que modificarlo haciendo uso de consoleMenu
 	global database,views
 	flag=False
 	tablas=[]
@@ -37,13 +40,15 @@ def tableSelector():
 
 	return res
 
-def removeDictionaryKey(d,k): #trabaja directamente sobre el diccionario
+def removeDictionaryKey(d,k):
+	"""Remueve una clave de un diccionario trabajando directamente sobre el"""
 	if d.get(k,False):
 		d.pop(k)
 
-def assignValue2Key(d,k,v=None): #asigna el valor por defecto a una key en un dict sin importar si existe
-    if d.get(k,None)==None:
-    	d[k]=v
+def assignValue2Key(d,k,v=None): 
+	"""Asigna el valor por defecto a una clave en un diccionario sin importar si existe"""
+	if d.get(k,None)==None:
+		d[k]=v
 
 def crearTablaPeriodo():
 	global database,period
@@ -239,17 +244,6 @@ def consoleMenu(title,params):
 		break
 	return res
 
-
-try:
-	with open(iniFile) as file: views = json.load(file)
-except:
-	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
-	views={}
-
-viewOld=views.copy()
-
-validateViews()
-
 def opcionTablas():
 	global database,table,views,period
 	sel=tableSelector()
@@ -304,6 +298,16 @@ def opcionExportar():
 		if table[0:6]=='gastos':
 			views.pop(table)
 
+try:
+	with open(iniFile) as file: views = json.load(file)
+except:
+	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
+	views={}
+
+viewOld=views.copy()
+
+validateViews()
+
 while True:
 	clear()
 	say(
@@ -311,15 +315,7 @@ while True:
 		font="slick",
 		align='left'
 	)
-	# say(
- #        'GESTION DE CONDOMINIO ver. {}'.format(version),
- #        space=False,
- #        font="console",
- #        colors=["black"],
- #        background="white",
- #        align="left"
- #    )
-	dummy='GESTION DE CONDOMINIO ver. {}'.format(version)
+	dummy='GESTION DE CONDOMINIO ver. {}'.format(VERSION)
 	print(dummy)
 	print('='*len(dummy))
 
@@ -334,28 +330,6 @@ while True:
 	menu2.append(['Exportar','opcionExportar'])
 	
 	if consoleMenu('Opciones',menu1): break
-
-	# print('\nMENU')
-	# print('====')
-	# print('{0}1) T{1}ablas'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	# print('{0}2) R{1}eportes'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	# print('{0}3) P{1}eríodo [{2}/{3}]'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,period[0:2],period[2:]))
-	# print('{0}4) I{1}mportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	# print('{0}5) E{1}xportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	# print('{0}0) S{1}alir'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	# tmp=input('>>> Seleccione > ')[0:1].upper()
-
-	# if tmp=='1' or tmp=='T': opcionTablas()
-
-	# if tmp=='2' or tmp=='R': opcionReportes()
-
-	# if tmp=='3' or tmp=='P': opcionPeriodo()
-
-	# if tmp=='4' or tmp=='I': opcionImportar()
-
-	# if tmp=='5' or tmp=='E': opcionExportar()
-
-	# if tmp=='0' or tmp=='S': break
 
 clear()
 
