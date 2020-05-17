@@ -212,8 +212,32 @@ def validateViews():
 			assignValue2Key(vt_c2,'visible',True)
 			assignValue2Key(vt_c2,'enabled',True)
 
-
-
+def consoleMenu(title,params):
+	res=False
+	while True:
+		i=0
+		print('\n'+title)
+		print('-'*len(title))
+		for p in params:
+			i+=1
+			print(i,'·',p[0])
+		print(0,'· salir')
+		error=False
+		sel=input('\n>> ')
+		if sel=='':sel=i+1
+		try:
+			sel=int(sel)
+		except:
+			sel=-1
+			error=True
+		if sel==0:
+			res=True
+		elif sel>i or error==True:
+			consoleMsgBox('error','Valor NO ES VALIDO',True)
+		else:
+			eval(params[sel-1][1])
+		break
+	return res
 
 
 try:
@@ -226,6 +250,60 @@ viewOld=views.copy()
 
 validateViews()
 
+def opcionTablas():
+	global database,table,views,period
+	sel=tableSelector()
+	if sel==None:
+		consoleMsgBox('error','Valor NO ES VALIDO',True)
+	else:
+		table=sel
+		if table=='gastos':
+			table='gastos_'+period
+			views[table]=views['gastos'].copy()
+			views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
+			views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
+			views[table]['table']=table
+		manejoTablas()
+		if table[0:6]=='gastos':
+			views.pop(table)
+
+def opcionReportes():
+	global database,table,views,period
+	if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
+
+def opcionPeriodo():
+	global database,table,views,period
+	month=input('Mes [MM] ? ')[0:2]
+	year=input('Año [YYYY] ? ')[0:4]
+	period=month+year
+	crearTablaPeriodo()
+	input()
+
+def opcionImportar():
+	global database,table,views,period
+	filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
+	importCsv(database,table,filename)
+
+def opcionExportar():
+	global database,table,views,period
+	sel=tableSelector()
+	if sel==None:
+		consoleMsgBox('error','Valor NO ES VALIDO',True)
+	else:
+		table=sel
+		if table=='gastos':
+			table='gastos_'+period
+			views[table]=views['gastos'].copy()
+			views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
+			views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
+			views[table]['table']=table
+		filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
+
+		if filename!='': exportCsv(database,table,filename+'.csv')
+
+		if table[0:6]=='gastos':
+			views.pop(table)
+
 while True:
 	clear()
 	say(
@@ -233,78 +311,53 @@ while True:
 		font="slick",
 		align='left'
 	)
-	say(
-        'GESTION DE CONDOMINIO ver. {}'.format(version),
-        space=False,
-        font="console",
-        colors=["black"],
-        background="white",
-        align="left"
-    )
-	#print('GESTION DE CONDOMINIO ver. {}\n'.format(version))
-	print('\nMENU')
-	print('====')
-	print('{0}1) T{1}ablas'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	print('{0}2) R{1}eportes'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	print('{0}3) P{1}eríodo [{2}/{3}]'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,period[0:2],period[2:]))
-	print('{0}4) I{1}mportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	print('{0}5) E{1}xportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	print('{0}0) S{1}alir'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
-	tmp=input('>>> Seleccione > ')[0:1].upper()
-	if tmp=='1' or tmp=='T':
-		sel=tableSelector()
-		if sel==None:
-			consoleMsgBox('error','Valor NO ES VALIDO',True)
-		else:
-			table=sel
-			if table=='gastos':
-				table='gastos_'+period
-				views[table]=views['gastos'].copy()
-				views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
-				views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
-				views[table]['table']=table
-			manejoTablas()
-			if table[0:6]=='gastos':
-				views.pop(table)
+	# say(
+ #        'GESTION DE CONDOMINIO ver. {}'.format(version),
+ #        space=False,
+ #        font="console",
+ #        colors=["black"],
+ #        background="white",
+ #        align="left"
+ #    )
+	dummy='GESTION DE CONDOMINIO ver. {}'.format(version)
+	print(dummy)
+	print('='*len(dummy))
 
-	if tmp=='2' or tmp=='R':
-		if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
+	menu1=[]
+	menu1.append(['Datos','opcionTablas()'])
+	menu1.append(['Tablas',"consoleMenu('Tablas',menu2)"])
+	menu1.append(['Período','opcionPeriodo()'])
+	menu1.append(['Reportes','opcionReportes()'])
 
-	if tmp=='3' or tmp=='P':
-		month=input('Mes [MM] ? ')[0:2]
-		year=input('Año [YYYY] ? ')[0:4]
-		period=month+year
-		crearTablaPeriodo()
-		input()
+	menu2=[]
+	menu2.append(['Importar','opcionImportar()'])
+	menu2.append(['Exportar','opcionExportar'])
+	
+	if consoleMenu('Opciones',menu1): break
 
-	if tmp=='4' or tmp=='I':
-		filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
-		importCsv(database,table,filename)
+	# print('\nMENU')
+	# print('====')
+	# print('{0}1) T{1}ablas'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
+	# print('{0}2) R{1}eportes'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
+	# print('{0}3) P{1}eríodo [{2}/{3}]'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,period[0:2],period[2:]))
+	# print('{0}4) I{1}mportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
+	# print('{0}5) E{1}xportar datos'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
+	# print('{0}0) S{1}alir'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL))
+	# tmp=input('>>> Seleccione > ')[0:1].upper()
 
-	if tmp=='5' or tmp=='E':
-		sel=tableSelector()
-		if sel==None:
-			consoleMsgBox('error','Valor NO ES VALIDO',True)
-		else:
-			table=sel
-			if table=='gastos':
-				table='gastos_'+period
-				views[table]=views['gastos'].copy()
-				views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
-				views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
-				views[table]['table']=table
-			filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
+	# if tmp=='1' or tmp=='T': opcionTablas()
 
-			if filename!='': exportCsv(database,table,filename+'.csv')
+	# if tmp=='2' or tmp=='R': opcionReportes()
 
-			if table[0:6]=='gastos':
-				views.pop(table)
+	# if tmp=='3' or tmp=='P': opcionPeriodo()
 
-	if tmp=='0' or tmp=='S':
-		break
+	# if tmp=='4' or tmp=='I': opcionImportar()
+
+	# if tmp=='5' or tmp=='E': opcionExportar()
+
+	# if tmp=='0' or tmp=='S': break
 
 clear()
-
 
 if views==viewOld:
 	consoleMsgBox('ok','SIN cambios en archivo Json')
