@@ -2,13 +2,13 @@
     "libro": {
         "database": "condominio.db3",
         "table": "libro",
-        "caption": "libro",
+        "caption": "Libro Diario",
         "sql": "SELECT * FROM libro",
-        "header": "",
-        "footer": "",
+        "header": "EDIFICIO GALERIAS MIRANDA\nLibro Diario\n",
+        "footer": "FdlT",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -16,7 +16,10 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "tipo": {
                 "type": "str",
@@ -47,7 +50,7 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789/-",
                 "visible": true,
                 "enabled": true
             },
@@ -55,7 +58,7 @@
                 "type": "str",
                 "caption": "descripcion",
                 "helper": "descripcion",
-                "capitalize": null,
+                "capitalize": "upper",
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
@@ -63,26 +66,32 @@
                 "enabled": true
             },
             "debe": {
-                "type": "str",
+                "type": "float",
                 "caption": "debe",
                 "helper": "debe",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789.",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             },
             "haber": {
-                "type": "str",
+                "type": "float",
                 "caption": "haber",
                 "helper": "haber",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789.",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             }
         }
     },
@@ -95,7 +104,7 @@
         "footer": "",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -103,7 +112,10 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "codigo": {
                 "type": "str",
@@ -161,26 +173,32 @@
                 "enabled": true
             },
             "alicuota": {
-                "type": "str",
+                "type": "float",
                 "caption": "alicuota",
                 "helper": "alicuota",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789.",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 4,
+                "min": null,
+                "max": null
             },
             "saldo": {
-                "type": "str",
+                "type": "float",
                 "caption": "saldo",
                 "helper": "saldo",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789.",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             },
             "contacto_nombre": {
                 "type": "str",
@@ -211,7 +229,7 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@._",
                 "visible": true,
                 "enabled": true
             }
@@ -221,12 +239,12 @@
         "database": "condominio.db3",
         "table": "gastos",
         "caption": "gastos",
-        "sql": "SELECT * FROM gastos",
+        "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
         "header": "",
         "footer": "",
         "columns": {
             "id": {
-                "type": "str",
+                "type": "int",
                 "caption": "id",
                 "helper": "id",
                 "capitalize": null,
@@ -234,11 +252,14 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "decimal_places": 0,
+                "min": null,
+                "max": null
             },
             "locales_codigo": {
                 "type": "str",
-                "caption": "locales_codigo",
+                "caption": "COD.LOCAL",
                 "helper": "locales_codigo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -249,7 +270,7 @@
             },
             "documento": {
                 "type": "str",
-                "caption": "documento",
+                "caption": "DOC.Nº",
                 "helper": "documento",
                 "capitalize": null,
                 "lenght_min": null,
@@ -260,7 +281,7 @@
             },
             "descripcion": {
                 "type": "str",
-                "caption": "descripcion",
+                "caption": "DESCRIPCION",
                 "helper": "descripcion",
                 "capitalize": null,
                 "lenght_min": null,
@@ -271,12 +292,12 @@
             },
             "precio": {
                 "type": "float",
-                "caption": "precio",
+                "caption": "PRECIO(Bs)",
                 "helper": "precio",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "allowedChars": "0123456789.",
                 "visible": true,
                 "enabled": true,
                 "decimal_places": 2,
@@ -284,18 +305,30 @@
                 "max": null
             },
             "cantidad": {
-                "type": "int",
-                "caption": "cantidad",
+                "type": "float",
+                "caption": "CANT.(UNIDS)",
                 "helper": "cantidad",
+                "capitalize": null,
+                "lenght_min": null,
+                "lenght_max": null,
+                "allowedChars": "0123456789.",
+                "visible": true,
+                "enabled": true,
+                "decimal_places": 2,
+                "min": null,
+                "max": null
+            },
+            "subtotal": {
+                "type": "float",
+                "caption": "SUBTOTAL(Bs)",
+                "helper": "subtotal",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
                 "enabled": true,
-                "decimal_places": 0,
-                "min": null,
-                "max": null
+                "decimal_places":2
             }
         }
     }

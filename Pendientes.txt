@@ -1,6 +1,6 @@
 Pendientes:
 
-terminar de arreglar archivo json
+terminar de arreglar archivo json <-en curso
 
 terminar con la implementacion de csv
 	para otras versiones: trabajar con formato xlsx
@@ -12,6 +12,8 @@ determinar si hay cambios en el descriptorio json y guardarlos... <-falta guarda
 arreglar todas las descripciones de funciones <-en proceso
 determinar si DATABASE es global <-en proceso
 cambiar menu selector de tablas por el nuevo menú <-verificar
+
+separar las funciones en modulos
 
 crear estructura de directorios
 	periodos

@@ -34,18 +34,19 @@ def consoleMsgBox(type,msg,enter=False):
 	Salidas:
 		No 
 	"""
+	cs=Style.BRIGHT
 	if type=='ok':
-		cs=Fore.BLACK+Back.GREEN
-		icon='[ok]'
+		cs+=Fore.GREEN
+		icon='[ ok ]'
 	elif type=='error':
-		cs=Fore.WHITE+Back.RED
-		icon='[!]'
+		cs+=Fore.RED
+		icon='[ !! ]'
 	elif type=='alert':
-		cs=Fore.BLACK+Back.YELLOW
-		icon='[A]'
+		cs+=Fore.YELLOW
+		icon='[ !! ]'
 	else:
 		cs=''
-	print(cs+icon+' : '+msg+' '+Style.RESET_ALL)
+	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')
 	if enter:
 		input()
 
@@ -176,7 +177,6 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 		else:
 			pass
 
-
 def renderTableAuto(params):
 	'''
 	Función:
@@ -282,95 +282,92 @@ def renderTableAuto(params):
 
 	return(output)
 
+# def showTable(database,table,style):
+# 	# 	Función:
+# 	#		Muestra una tabla por consola
+# 	# 	Entrada:
+# 	#		database - string - nombre de la base de datos
+# 	#		table    - string - nombre de la tabla
+# 	#		style    - dict   - tiene todos los parámetros que dibujan la tabla
+# 	# 	Regresa:
+# 	#		nada
 
-def showTable(database,table,style):
-#
-# Descripción: Muestra una tabla por consola
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	style    - dict   - tiene todos los parámetros que dibujan la tabla
-# Regresa:
-#	nada
-#
-	style_h=style.get('header',{})
-	style_d=style.get('data',{})
-	sql=style.get('sql','SELECT * FROM {}'.format(table))
-	#print(sql)
-	style_title=Fore.BLACK+Back.CYAN+Style.BRIGHT
-	style_bold=Style.BRIGHT
-	con = lite.connect(database)
-	con.row_factory = lite.Row
-	cur = con.cursor()
-	cur.execute(sql)
-	printHeader=True
-	lines=1
-	while True:
-		row = cur.fetchone()
-		if row == None:
-			break
-		row = dict(zip(row.keys(),row))
-		if printHeader:
-			printHeader=False
-			keys=row.keys()
-			tmp=[]
-			for k in keys:
-				tmp.append(k)
-			keys=tmp
-			print('TABLA: {}{}\n'.format(style_bold,table.upper()))
-			header=('{}'.format(style_title))
-			for i in range(0,len(keys)):
-				header+=style_h.get(keys[i],'{} ').format(keys[i])
-			print(header)
-		values=row.values()
-		tmp=[]
-		for v in values:
-			if v==None:
-				tmp.append('None')
-			else:
-				tmp.append(v)
-		values=tmp
-		if style.get('zebra',False)==True and lines%2==0:
-			line=Back.WHITE+Fore.BLACK
-		else:
-			line=Fore.WHITE+Back.BLACK
-		lines+=1
-		for i in range(0,len(values)):
-			line+=style_d.get(keys[i],'{} ').format(values[i])
-		print(line)
-	con.close()
+# 	style_h=style.get('header',{})
+# 	style_d=style.get('data',{})
+# 	sql=style.get('sql','SELECT * FROM {}'.format(table))
+# 	#print(sql)
+# 	style_title=Fore.BLACK+Back.CYAN+Style.BRIGHT
+# 	style_bold=Style.BRIGHT
+# 	con = lite.connect(database)
+# 	con.row_factory = lite.Row
+# 	cur = con.cursor()
+# 	cur.execute(sql)
+# 	printHeader=True
+# 	lines=1
+# 	while True:
+# 		row = cur.fetchone()
+# 		if row == None:
+# 			break
+# 		row = dict(zip(row.keys(),row))
+# 		if printHeader:
+# 			printHeader=False
+# 			keys=row.keys()
+# 			tmp=[]
+# 			for k in keys:
+# 				tmp.append(k)
+# 			keys=tmp
+# 			print('TABLA: {}{}\n'.format(style_bold,table.upper()))
+# 			header=('{}'.format(style_title))
+# 			for i in range(0,len(keys)):
+# 				header+=style_h.get(keys[i],'{} ').format(keys[i])
+# 			print(header)
+# 		values=row.values()
+# 		tmp=[]
+# 		for v in values:
+# 			if v==None:
+# 				tmp.append('None')
+# 			else:
+# 				tmp.append(v)
+# 		values=tmp
+# 		if style.get('zebra',False)==True and lines%2==0:
+# 			line=Back.WHITE+Fore.BLACK
+# 		else:
+# 			line=Fore.WHITE+Back.BLACK
+# 		lines+=1
+# 		for i in range(0,len(values)):
+# 			line+=style_d.get(keys[i],'{} ').format(values[i])
+# 		print(line)
+# 	con.close()
 
 def getRow(database,table,id_name,id_value):
-#
-# Descripción: Obtiene una línea de datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-#	id_value - string - valor a buscar
-# Regresa:
-#	dict - valores retornados
-#
+	# 	Función:
+	#		Obtiene una línea de datos de una base de datos SQLite
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		table    - string - nombre de la tabla
+	#		id_name  - string - nombre de la columna de apuntador normalmente 'id'
+	#		id_value - string - valor a buscar
+	# 	Regresa:
+	#		dict - valores retornados
+
 	con = lite.connect(database)
 	con.row_factory = lite.Row #
 	cur = con.cursor()
 	cur.execute('SELECT * FROM {0} WHERE {1} = {2}'.format(table,id_name,id_value))
 	row = cur.fetchone()
-	row=dict(zip(row.keys(), row)) #
+	row=dict(zip(row.keys(), row)) 
 	con.close()
 	return row
 
 def getRowSql(database,sql):
-#
-# Descripción: Obtiene una línea de datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-#	id_value - string - valor a buscar
-# Regresa:
-#	dict - valores retornados
-#
+	# 	Función:
+	# 		Obtiene una línea de datos de una base de datos SQLite mediante un query
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		sql: string <- query que genera la búsqueda
+	# 	Regresa:
+	#		dict - valores retornados
+
 	con = lite.connect(database)
 	con.row_factory = lite.Row #
 	cur = con.cursor()
@@ -380,16 +377,15 @@ def getRowSql(database,sql):
 	con.close()
 	return row
 
-
 def getTable(database,table):
-#
-# Descripción: Obtiene todos los datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-# Regresa:
-#	list - valores retornados DEBERIA ser dict
-#
+	# 	Función:
+	#	 	Obtiene todos los datos de una base de datos SQLite
+	# 	Entrada:
+	#		database: str <- nombre de la base de datos
+	#		table: str <- nombre de la tabla
+	# 	Regresa:
+	#		list - valores retornados DEBERIA ser dict
+
 	con = lite.connect(database)
 	cur = con.cursor()
 	res=sql='SELECT * FROM {0}'.format(table)
@@ -399,12 +395,13 @@ def getTable(database,table):
 	return rows
 
 def tableList(database):
-	Descripcion=''' Obtiene una línea de datos de una base de datos SQLite
-	Entrada:
-		database - string - nombre de la base de datos
-	Regresa:
-		tuple - valores retornados
-	'''
+	# 	Función:
+	# 		Obtiene lista de tablas en una base de datos SQLite
+	# 	Entrada:
+	# 		database: string <- nombre de la base de datos
+	# 	Regresa:
+	# 		tuple: valores retornados
+
 	con = lite.connect(database)
 	cur = con.cursor()
 	cur.execute("select name from sqlite_master where type='table' and name!='sqlite_sequence'")
@@ -418,15 +415,15 @@ def tableList(database):
 	return res
 
 def insertRow(database,table,data):
-	Descripcion='''
-	Inserta una línea de datos de una base de datos SQLite
-	Entrada:
-		database - string - nombre de la base de datos
-		table    - string - nombre de la tabla
-		data     - dict   - datos en forma de pares key-value
-	Regresa:
-		bool - True si se ingresó el dato correctamente
-	'''
+	# 	Función:
+	# 		Inserta una línea de datos de una base de datos SQLite
+	# 	Entrada:
+	# 		database: str <- nombre de la base de datos
+	# 		table: str <- nombre de la tabla
+	# 		data: dict <- datos en forma de pares key-value
+	# Regresa:
+	# 		bool: True si se ingresó el dato correctamente
+
 	res = True
 	keys=data.keys()
 	tmp=''
@@ -449,17 +446,17 @@ def insertRow(database,table,data):
 	con.close()
 	return res
 
-def changeRowId(database,table,old_id,new_id): #REVISAR
-#
-# Descripción: cambia el id  a una línea de datos de una base de datos SQLite
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	old_id	 - integer- id a cambiar
-# 	new_id	 - integer- id nuevo
-# Regresa:
-# 	bool - True si se ingresó el dato correctamente OJO::: hay que revisar
-#
+def changeRowId(database,table,old_id,new_id):
+	# 	Función:
+	# 		cambia el id  a una línea de datos de una base de datos SQLite
+	# 	Entrada:
+	# 		database: str <- nombre de la base de datos
+	# 		table: str <- nombre de la tabla
+	# 		old_id: integer <- id a cambiar
+	# 		new_id: integer <- id nuevo
+	# 	Regresa:
+	# 		bool: True si se ingresó el dato correctamente OJO::: hay que revisar
+
 	res = True
 	con = lite.connect(database)
 	with con:
@@ -473,17 +470,16 @@ def changeRowId(database,table,old_id,new_id): #REVISAR
 	if con: con.close()
 	return res
 
-def updateRow(database,table,data): #REVISAR
-#
-# Descripción: cambia el id  a una línea de datos de una base de datos SQLite
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	old_id	 - integer- id a cambiar
-# 	new_id	 - integer- id nuevo
-# Regresa:
-# 	bool - True si se ingresó el dato correctamente OJO::: hay que revisar
-#
+def updateRow(database,table,data): 
+	# 	Función: 
+	# 		cambia el id  a una línea de datos de una base de datos SQLite
+	# 	Entrada:
+	# 		database: str <- nombre de la base de datos
+	# 		table: str <- nombre de la tabla
+	#		data: dict <- data en forma de pares key-value
+	# 	Regresa:
+	# 		bool: True si se ingresó el dato correctamente OJO::: hay que revisar
+
 	res = True
 	keys=data.keys()
 	subs=''

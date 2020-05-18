@@ -110,7 +110,7 @@ def manejoTablas():
 
 		print('\n'+views[table].get('footer','EoT\n'))
 
-		tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar {0}S{1}alir > '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
+		tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar >> '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
 		
 		command=tmp.split(' ')
 		opcion=command[0]
@@ -119,7 +119,7 @@ def manejoTablas():
 		else:
 			opPar=0
 
-		if opcion=='S':
+		if opcion=='':
 			break
 
 		elif opcion=='N':
@@ -156,8 +156,8 @@ def manejoTablas():
 	clear()
 
 def validateViews():
-	global database,view
-	tmp=(tableList(database))
+	global DATABASE,views
+	tmp=(tableList(DATABASE))
 
 	if 'gastos' not in tmp:
 		create_gastos_sql="CREATE TABLE gastos ( \
@@ -168,7 +168,7 @@ def validateViews():
 		    precio         REAL           DEFAULT ( 0.0 ),\
 		    cantidad       REAL           DEFAULT ( 0.0 ));"
 
-		con = lite.connect(database)
+		con = lite.connect(DATABASE)
 		cur = con.cursor()
 		cur.execute(create_gastos_sql)
 		con.close()
@@ -187,7 +187,7 @@ def validateViews():
 		assignValue2Key(views,t,{})
 
 		vt=views[t]
-		assignValue2Key(vt,'database',database)
+		assignValue2Key(vt,'database',DATABASE)
 		assignValue2Key(vt,'table',t)
 		assignValue2Key(vt,'caption',t)
 		assignValue2Key(vt,'sql','SELECT * FROM {}'.format(t))
@@ -321,7 +321,7 @@ except:
 	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
 	views={}
 
-viewOld=views.copy()
+#viewOld=views.copy()
 
 validateViews()
 
@@ -350,15 +350,23 @@ while True:
 
 clear()
 
-if views==viewOld:
-	consoleMsgBox('ok','SIN cambios en archivo Json')
-else:
+if input('[ ?? ] : Guardar cambios en Configuración? (s/n)' ).upper()=='S':
 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
 	fic = open(iniFile, "w")
 	fic.write(json.dumps(views,indent=4))
 	fic.close()
 
-print('bye!\n')
+
+# if views==viewOld:
+# 	consoleMsgBox('ok','SIN cambios en archivo Json')
+# else:
+# 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
+# 	fic = open(iniFile, "w")
+# 	fic.write(json.dumps(views,indent=4))
+# 	fic.close()
+
+consoleMsgBox('ok','Bye!\n')
+#print('bye!\n')
 
 sys.exit()
 
