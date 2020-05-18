@@ -13,11 +13,15 @@ database=DATABASE
 table='locales'
 period='012020'
 
-def tableSelector(): #hay que modificarlo haciendo uso de consoleMenu
-	global database,views
+def tableSelector():
+	#	Función:
+	#		Explora la base de datos, crea menú de selección, devuelve el nombre de la tabla
+	#		o Null si la opción entrada no es válida
+	global DATABASE,views
 	flag=False
+	title='Tablas Disponibles'
 	tablas=[]
-	for t in tableList(database):
+	for t in tableList(DATABASE):
 		if 'gastos' not in t:
 			tablas.append(t)
 		else:
@@ -25,34 +29,51 @@ def tableSelector(): #hay que modificarlo haciendo uso de consoleMenu
 				flag=True
 				tablas.append('gastos')
 
-	print('Tablas disponibles :')
-	i=1
+	menuTablas=[]
 	for t in tablas:
-		print('{0}{2}{1}) {3}'.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL,i,views[t].get('caption',t)))
-		i+=1
-	tmp=input('>>> Seleccione > ')
-	try:
-		tmp=int(tmp)-1
-		if tmp<0:tmp=None
-		res=tablas[tmp]
-	except:
-		res=None
+		menuTablas.append([views[t]['caption'],t])
 
+	i=0
+	print('\n'+title)
+	print('-'*len(title))
+	for p in menuTablas:
+		i+=1
+		print(i,'·',p[0])
+	error=False
+	sel=input('\n>> ')
+	if sel=='': sel=0
+	try:
+		sel=int(sel)
+	except:
+		sel=0
+		error=True
+	if sel==0:
+		res=None
+	elif sel>i or error==True:
+		consoleMsgBox('error','Valor NO ES VALIDO',True)
+		res=None
+	else:
+		res=menuTablas[sel-1][1]
 	return res
 
 def removeDictionaryKey(d,k):
-	"""Remueve una clave de un diccionario trabajando directamente sobre el"""
+	#	Función:
+	#		Remueve una clave de un diccionario trabajando directamente sobre el mismo
 	if d.get(k,False):
 		d.pop(k)
 
 def assignValue2Key(d,k,v=None): 
-	"""Asigna el valor por defecto a una clave en un diccionario sin importar si existe"""
+	#	Función:
+	#		Asigna el valor por defecto a una clave en un diccionario y si no existe la crea
 	if d.get(k,None)==None:
 		d[k]=v
 
 def crearTablaPeriodo():
-	global database,period
-	if 'gastos_'+period not in tableList(database):
+	#	Función:
+	#		Crea una copia de la tabla gastos con el nombre gastos_MMYYYY donde MMYYYY es el
+	#		período 
+	global DATABASE,period
+	if 'gastos_'+period not in tableList(DATABASE):
 
 		create_gastos_sql="CREATE TABLE gastos{} ( \
 		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
@@ -62,7 +83,7 @@ def crearTablaPeriodo():
 		    precio         REAL           DEFAULT ( 0.0 ),\
 		    cantidad       REAL           DEFAULT ( 0.0 ));".format('_'+period)
 
-		con = lite.connect(database)
+		con = lite.connect(DATABASE)
 		cur = con.cursor()
 		cur.execute(create_gastos_sql)
 		con.close()
@@ -72,12 +93,11 @@ def crearTablaPeriodo():
 	consoleMsgBox('ok','Cambio a período {}/{}'.format(period[0:2],period[2:]))
 
 def manejoTablas():
-	global database,table,period,views
+	global DATABASE,table,period,views
 	while True:
 		clear()
-
 		header=views[table].get('header','')
-		header+='<{} in {}>'.format(table,database)
+		header+='<{} in {}>'.format(table,DATABASE)
 		print(header+'\n')
 
 		firstRow=True
@@ -89,7 +109,6 @@ def manejoTablas():
 				print(rl+Style.RESET_ALL)
 
 		print('\n'+views[table].get('footer','EoT\n'))
-
 
 		tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar {0}S{1}alir > '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
 		
@@ -104,15 +123,13 @@ def manejoTablas():
 			break
 
 		elif opcion=='N':
-			print(database,table)
-			input()
-			data={'id':str(maxId(database,table,'id')+1)}
-			if insertRow(database,table,data):
+			data={'id':str(maxId(DATABASE,table,'id')+1)}
+			if insertRow(DATABASE,table,data):
 				consoleMsgBox('ok','Nuevo registro ingresado',False)
-				modificarRegistro('id',data['id'],views.get(table,{'database':database,'table':table}))
+				# modificarRegistro('id',data['id'],views.get(table,{'database':DATABASE,'table':table}))
+				modificarRegistro('id',data['id'],views[table])
 			else:
 				consoleMsgBox('error','No se pudo ingresar el registro')
-
 
 		elif opcion=='M':
 			if opPar==0:
@@ -121,25 +138,21 @@ def manejoTablas():
 				id=opPar
 			modificarRegistro('id',id,views[table])
 
-
-
 		elif opcion=='B':
 			if opPar==0:
 				id=int(input('[?] Ingrese ID del registro a BORRAR > '))
 			else:
 				id=opPar
-			if recordExist(database,table,'id',id):
-				deleteRow(database,table,'id',id)
-				defragmentTable(database,table)
+			if recordExist(DATABASE,table,'id',id):
+				deleteRow(DATABASE,table,'id',id)
+				defragmentTable(DATABASE,table)
 				consoleMsgBox('ok','Operación exitosa. Registro id={} BORRADO'.format(id),False)
 			else:
 				consoleMsgBox('error','Registro id={} no existe'.format(id),False)
 
-
 		else:
-			print('[!] Opción no válida. H para ayuda')
+			consoleMsgBox('error','Opción NO VALIDA')
 		input('Pulse ENTER para continuar...')
-
 	clear()
 
 def validateViews():
@@ -218,6 +231,8 @@ def validateViews():
 			assignValue2Key(vt_c2,'enabled',True)
 
 def consoleMenu(title,options,exitOption='Salir',nullExit=False):
+	#	Función:
+	#		Crea un menú por consola de selección simple
 	res=False
 	while True:
 		i=0
@@ -249,11 +264,11 @@ def consoleMenu(title,options,exitOption='Salir',nullExit=False):
 	return res
 
 def opcionTablas():
-	global database,table,views,period
+	global DATABASE,table,views,period
 	sel=tableSelector()
-	if sel==None:
-		consoleMsgBox('error','Valor NO ES VALIDO',True)
-	else:
+	if sel!=None:
+	# 	consoleMsgBox('error','Valor NO ES VALIDO',True)
+	# else:
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
@@ -266,11 +281,11 @@ def opcionTablas():
 			views.pop(table)
 
 def opcionReportes():
-	global database,table,views,period
+	global DATABASE,table,views,period
 	if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
 
 def opcionPeriodo():
-	global database,table,views,period
+	global DATABASE,table,views,period
 	month=input('Mes [MM] ? ')[0:2]
 	year=input('Año [YYYY] ? ')[0:4]
 	period=month+year
@@ -278,12 +293,12 @@ def opcionPeriodo():
 	input()
 
 def opcionImportar():
-	global database,table,views,period
+	global DATABASE,table,views,period
 	filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
 	importCsv(database,table,filename)
 
 def opcionExportar():
-	global database,table,views,period
+	global DATABASE,table,views,period
 	sel=tableSelector()
 	if sel==None:
 		consoleMsgBox('error','Valor NO ES VALIDO',True)

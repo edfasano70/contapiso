@@ -14,14 +14,26 @@ from cfonts import render, say
 colorama.init(autoreset=True)
 
 def clear():
-	Descripcion='''Borra la consola'''
+	'''
+	Función:
+		Borra la consola
+	'''
 	if os.name == "nt":
 		os.system("cls")
 	else:
 		os.system("clear")
 
 def consoleMsgBox(type,msg,enter=False):
-	#type = ok,error,alert
+	"""
+	Función:
+		Imprime mensaje tipo "alertBox" por consola
+	Entradas:
+		type: str <- ok,error,alert
+		msg: str <- mensaje a desplegar
+		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
+	Salidas:
+		No 
+	"""
 	if type=='ok':
 		cs=Fore.BLACK+Back.GREEN
 		icon='[ok]'
@@ -37,36 +49,34 @@ def consoleMsgBox(type,msg,enter=False):
 	if enter:
 		input()
 
-
-def isNumber(s):
-#
-# Descripción: Devuelve True si s es del object tipo int o float
-# Entrada:
-#	s 		- 	valor a checkear
-# Regresa:
-#	bool	-	True si s es int o float
-#
+def isNumber(value):
+	"""
+	Función: 
+		Devuelve True si s es del object tipo int o float
+	Entrada:
+		value: obj <-valor a checkear
+	Regresa:
+		bool: True si value es int o float
+	"""
 	res=False
-	if type(s)==type(1):
+	if type(value)==type(1):
 		res=True
-	elif type(s)==type(1.0):
+	elif type(value)==type(1.0):
 		res=True
 	return res
 
 def dict_factory(cursor, row):
-#
-# Descripción: Función necesaria para que fetch en la base de datos devuelva dict
-# Entrada:
-#	cursor 	- 	apuntador del resultado
-#	row 	- 	datos regresados
-# Regresa:
-#	dict	-	con los resultados
-#
+    # Función:
+    # 	Necesaria para que fetch en la base de datos devuelva dict
+    # Entrada:
+    # 	cursor: apuntador del resultado
+    # 	row: datos regresados
+    # Regresa:
+    # 	dict: con los resultados en formato dict
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
-
 
 def generarReporte(database,inicio,cantidad,output='console',input_file='',output_file=''):
 	#output puede ser console, html, pdf
@@ -168,15 +178,16 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 
 
 def renderTableAuto(params):
-	Descripcion='''
-	Genera el código para imprimir una tabla
+	'''
+	Función:
+		Genera el código para imprimir una tabla
  	Entrada:
-		database - string - nombre de la base de datos
-		table    - string - nombre de la tabla
-		style    - dict   - tiene todos los parámetros que dibujan la tabla
-		output	 - string - puede ser console, str, html
- 	Regresa:
-		string	-	con todo el codigo para mostrar la tabla
+ 		params: dict <-contiene todos los parámetros para generar la tabla
+			database: string <- nombre de la base de datos
+			table: string <- nombre de la tabla
+			style: dict <- tiene todos los parámetros que dibujan la tabla
+	Regresa:
+		string <- con todo el codigo para mostrar la tabla
  	Pendiente:
  		opción html
  	'''

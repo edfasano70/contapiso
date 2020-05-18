@@ -6,3 +6,7 @@ determinar si hay cambios en el descriptorio json y guardarlos... *** falta guar
 
 para otras versiones:
 trabajar con formato xlsx
+
+arreglar todas las descripciones de funciones
+determinar si DATABASE es global
+cambiar menu selector de tablas por el nuevo menú
