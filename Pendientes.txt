@@ -1,12 +1,23 @@
 Pendientes:
-terminar con la implementacion de csv *** falta importación
+
+terminar de arreglar archivo json
+
+terminar con la implementacion de csv
+	para otras versiones: trabajar con formato xlsx
+
 introducir validacion de numeros con minimo y maximo
 introducir validacion de fecha
-determinar si hay cambios en el descriptorio json y guardarlos... *** falta guardar un respaldo
+determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
-para otras versiones:
-trabajar con formato xlsx
+arreglar todas las descripciones de funciones <-en proceso
+determinar si DATABASE es global <-en proceso
+cambiar menu selector de tablas por el nuevo menú <-verificar
 
-arreglar todas las descripciones de funciones
-determinar si DATABASE es global
-cambiar menu selector de tablas por el nuevo menú
+crear estructura de directorios
+	periodos
+		csv
+		xlsx
+		pdf
+
+al crear nuevo periodo generar estructura de directorios
+

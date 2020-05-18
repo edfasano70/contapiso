@@ -267,8 +267,6 @@ def opcionTablas():
 	global DATABASE,table,views,period
 	sel=tableSelector()
 	if sel!=None:
-	# 	consoleMsgBox('error','Valor NO ES VALIDO',True)
-	# else:
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
