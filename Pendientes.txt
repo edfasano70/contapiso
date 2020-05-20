@@ -10,8 +10,6 @@ introducir validacion de fecha
 determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
 arreglar todas las descripciones de funciones <-en proceso
-determinar si DATABASE es global <-en proceso
-cambiar menu selector de tablas por el nuevo menú <-verificar
 
 separar las funciones en modulos
 
@@ -23,3 +21,6 @@ crear estructura de directorios
 
 al crear nuevo periodo generar estructura de directorios
 
+Hechas:
+determinar si DATABASE es global <-en proceso
+cambiar menu selector de tablas por el nuevo menú <-verificar

@@ -92,7 +92,51 @@ def crearTablaPeriodo():
 		pass
 	consoleMsgBox('ok','Cambio a período {}/{}'.format(period[0:2],period[2:]))
 
+def newModificarRegistro(id_name,id_value):
+	# 	Función:
+	# 		Modifica un registro preguntando valores
+	# 	Entrada:
+	# 		database: str <- nombre de la base de datos
+	# 		table: str <- nombre de la tabla
+	# 		id_name: str <- nombre de la columna apuntador normalmente 'id'
+	# 		id_value: str <- valor a modificar
+	# 	Regresa:
+	# 		DEBERIA regresar bool - True si se modificó
+	global DATABASE,table,views
+	res=True
+	if recordExist(DATABASE,table,id_name,id_value):
+		row=getRow(DATABASE,table,id_name,id_value)
+		data={}
+		for c in row.keys():
+			cStyle=views[table]['columns'][c]
+			while True:
+				caption=cStyle.get('caption')
+				helper=cStyle.get('helper')
+
+				if row[c]==None or row[c]=='':
+					row[c]=cStyle.get('default_value','')
+				if cStyle.get('enabled'):
+					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
+				else:
+					print('{} : {}'.format(caption,row[c]))
+					data[c]=str(row[c])
+					break
+				if tmp=='': tmp=row[c]
+				res, tmp, msg=validateInput(tmp,cStyle)
+				if msg!='':print(msg)
+				if res:
+					data[c]=tmp 
+					break
+		updateRow(DATABASE,table,data)
+		consoleMsgBox('ok','Registro actualizado')
+	else:
+		consoleMsgBox('error','El registro id={} NO EXISTE'.format(id_value))
+		res=False
+	return res
+
 def manejoTablas():
+	#	Función:
+	#		Implementa las funciones CRUD sobre la tabla 'table' en 'DATABASE'
 	global DATABASE,table,period,views
 	while True:
 		clear()
@@ -126,8 +170,8 @@ def manejoTablas():
 			data={'id':str(maxId(DATABASE,table,'id')+1)}
 			if insertRow(DATABASE,table,data):
 				consoleMsgBox('ok','Nuevo registro ingresado',False)
-				# modificarRegistro('id',data['id'],views.get(table,{'database':DATABASE,'table':table}))
-				modificarRegistro('id',data['id'],views[table])
+				# newModificarRegistro('id',data['id'],views[table])
+				newModificarRegistro('id',data['id'])
 			else:
 				consoleMsgBox('error','No se pudo ingresar el registro')
 
@@ -136,7 +180,8 @@ def manejoTablas():
 				id=int(input('[?] Ingrese ID del registro a MODIFICAR > '))
 			else:
 				id=opPar
-			modificarRegistro('id',id,views[table])
+#			ModificarRegistro('id',id,views[table])
+			newModificarRegistro('id',id)
 
 		elif opcion=='B':
 			if opPar==0:
@@ -156,6 +201,11 @@ def manejoTablas():
 	clear()
 
 def validateViews():
+	#	Función:
+	#		Valida el dict 'views' que contiene toda la información de despliegue de las tablas
+	#		Ingresa valores por defecto
+	#	Pendiente:
+	#		Que regrese un bool que sea True si se modificó 'views'
 	global DATABASE,views
 	tmp=(tableList(DATABASE))
 
@@ -232,7 +282,14 @@ def validateViews():
 
 def consoleMenu(title,options,exitOption='Salir',nullExit=False):
 	#	Función:
-	#		Crea un menú por consola de selección simple
+	# 		Crea un menú por consola de selección simple
+	# 	Entradas:
+	# 		title: str <- título del menú
+	# 		options: list <- contiene pares de opción y comando a ejecutar
+	# 		exitOption: str <- nombre que va a tener la opción de salida del menú
+	# 		nullExit: bool <- si es true se sale del menú solo pulsando ENTER
+	# 	Regresa:
+	# 		bool <- TRUE si se seleccionó una opción válida
 	res=False
 	while True:
 		i=0
@@ -264,6 +321,11 @@ def consoleMenu(title,options,exitOption='Salir',nullExit=False):
 	return res
 
 def opcionTablas():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Llama a tableSelector()
+	# 		Llama a manejoTablas() si la opción es válida
+	#		Si la tabla es gastos cambia los parámetros a la tabla de gastos del período
 	global DATABASE,table,views,period
 	sel=tableSelector()
 	if sel!=None:
@@ -279,10 +341,16 @@ def opcionTablas():
 			views.pop(table)
 
 def opcionReportes():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Llama a generarReporte()
 	global DATABASE,table,views,period
 	if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
 
 def opcionPeriodo():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Cambia el período
 	global DATABASE,table,views,period
 	month=input('Mes [MM] ? ')[0:2]
 	year=input('Año [YYYY] ? ')[0:4]
@@ -291,11 +359,21 @@ def opcionPeriodo():
 	input()
 
 def opcionImportar():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Importa datos de archivo externo
+	#	Pendiente:
+	#		que pida nombre de archivo
+	#		formato xlsx
 	global DATABASE,table,views,period
 	filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
 	importCsv(database,table,filename)
 
 def opcionExportar():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Exporta datos de una tabla a un archivo externo
+	#		usa tableSelector()
 	global DATABASE,table,views,period
 	sel=tableSelector()
 	if sel==None:
@@ -318,7 +396,8 @@ def opcionExportar():
 try:
 	with open(iniFile) as file: views = json.load(file)
 except:
-	print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
+	consoleMsgBox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(iniFile),True)
+	# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
 	views={}
 
 #viewOld=views.copy()
@@ -366,8 +445,6 @@ if input('[ ?? ] : Guardar cambios en Configuración? (s/n)' ).upper()=='S':
 # 	fic.close()
 
 consoleMsgBox('ok','Bye!\n')
-#print('bye!\n')
-
 sys.exit()
 
 

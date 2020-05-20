@@ -14,26 +14,22 @@ from cfonts import render, say
 colorama.init(autoreset=True)
 
 def clear():
-	'''
-	Función:
-		Borra la consola
-	'''
+	# Función:
+	# 	Borra la consola
 	if os.name == "nt":
 		os.system("cls")
 	else:
 		os.system("clear")
 
 def consoleMsgBox(type,msg,enter=False):
-	"""
-	Función:
-		Imprime mensaje tipo "alertBox" por consola
-	Entradas:
-		type: str <- ok,error,alert
-		msg: str <- mensaje a desplegar
-		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
-	Salidas:
-		No 
-	"""
+	# 	Función:
+	# 		Imprime mensaje tipo "alertBox" por consola
+	# 	Entradas:
+	# 		type: str <- ok,error,alert
+	# 		msg: str <- mensaje a desplegar
+	# 		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
+	# 	Salidas:
+	# 		No 
 	cs=Style.BRIGHT
 	if type=='ok':
 		cs+=Fore.GREEN
@@ -51,14 +47,12 @@ def consoleMsgBox(type,msg,enter=False):
 		input()
 
 def isNumber(value):
-	"""
-	Función: 
-		Devuelve True si s es del object tipo int o float
-	Entrada:
-		value: obj <-valor a checkear
-	Regresa:
-		bool: True si value es int o float
-	"""
+	# 	Función: 
+	# 		Devuelve True si s es del object tipo int o float
+	# 	Entrada:
+	# 		value: obj <-valor a checkear
+	# 	Regresa:
+	# 		bool: True si value es int o float
 	res=False
 	if type(value)==type(1):
 		res=True
@@ -67,19 +61,19 @@ def isNumber(value):
 	return res
 
 def dict_factory(cursor, row):
-    # Función:
-    # 	Necesaria para que fetch en la base de datos devuelva dict
-    # Entrada:
-    # 	cursor: apuntador del resultado
-    # 	row: datos regresados
-    # Regresa:
-    # 	dict: con los resultados en formato dict
+    # 	Función:
+    # 		Necesaria para que fetch en la base de datos devuelva dict
+    # 	Entrada:
+    # 		cursor: apuntador del resultado
+    # 		row: datos regresados
+    # 	Regresa:
+    # 		dict: con los resultados en formato dict
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
 
-def generarReporte(database,inicio,cantidad,output='console',input_file='',output_file=''):
+def generarReporte(database,inicio,cantidad,output='console',input_file='',output_file=''):#ojo
 	#output puede ser console, html, pdf
 	#obtenemos el total de gastos
 	con = lite.connect(database)
@@ -178,19 +172,18 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 			pass
 
 def renderTableAuto(params):
-	'''
-	Función:
-		Genera el código para imprimir una tabla
- 	Entrada:
- 		params: dict <-contiene todos los parámetros para generar la tabla
-			database: string <- nombre de la base de datos
-			table: string <- nombre de la tabla
-			style: dict <- tiene todos los parámetros que dibujan la tabla
-	Regresa:
-		string <- con todo el codigo para mostrar la tabla
- 	Pendiente:
- 		opción html
- 	'''
+	#	Función:
+	# 		Genera el código para imprimir una tabla
+ 	#	Entrada:
+ 	#		params: dict <-contiene todos los parámetros para generar la tabla
+	#			database: string <- nombre de la base de datos
+	#			table: string <- nombre de la tabla
+	#			style: dict <- tiene todos los parámetros que dibujan la tabla
+	#	Regresa:
+	#		string <- con todo el codigo para mostrar la tabla
+ 	#	Pendiente:
+ 	#		validar errores
+ 	#		opción html
 	database=params.get('database')
 	table=params.get('table')
 	sql=params.get('sql','SELECT * FROM {}'.format(table))
@@ -282,64 +275,7 @@ def renderTableAuto(params):
 
 	return(output)
 
-# def showTable(database,table,style):
-# 	# 	Función:
-# 	#		Muestra una tabla por consola
-# 	# 	Entrada:
-# 	#		database - string - nombre de la base de datos
-# 	#		table    - string - nombre de la tabla
-# 	#		style    - dict   - tiene todos los parámetros que dibujan la tabla
-# 	# 	Regresa:
-# 	#		nada
-
-# 	style_h=style.get('header',{})
-# 	style_d=style.get('data',{})
-# 	sql=style.get('sql','SELECT * FROM {}'.format(table))
-# 	#print(sql)
-# 	style_title=Fore.BLACK+Back.CYAN+Style.BRIGHT
-# 	style_bold=Style.BRIGHT
-# 	con = lite.connect(database)
-# 	con.row_factory = lite.Row
-# 	cur = con.cursor()
-# 	cur.execute(sql)
-# 	printHeader=True
-# 	lines=1
-# 	while True:
-# 		row = cur.fetchone()
-# 		if row == None:
-# 			break
-# 		row = dict(zip(row.keys(),row))
-# 		if printHeader:
-# 			printHeader=False
-# 			keys=row.keys()
-# 			tmp=[]
-# 			for k in keys:
-# 				tmp.append(k)
-# 			keys=tmp
-# 			print('TABLA: {}{}\n'.format(style_bold,table.upper()))
-# 			header=('{}'.format(style_title))
-# 			for i in range(0,len(keys)):
-# 				header+=style_h.get(keys[i],'{} ').format(keys[i])
-# 			print(header)
-# 		values=row.values()
-# 		tmp=[]
-# 		for v in values:
-# 			if v==None:
-# 				tmp.append('None')
-# 			else:
-# 				tmp.append(v)
-# 		values=tmp
-# 		if style.get('zebra',False)==True and lines%2==0:
-# 			line=Back.WHITE+Fore.BLACK
-# 		else:
-# 			line=Fore.WHITE+Back.BLACK
-# 		lines+=1
-# 		for i in range(0,len(values)):
-# 			line+=style_d.get(keys[i],'{} ').format(values[i])
-# 		print(line)
-# 	con.close()
-
-def getRow(database,table,id_name,id_value):
+def getRow(database,table,id_name='id',id_value=None):
 	# 	Función:
 	#		Obtiene una línea de datos de una base de datos SQLite
 	# 	Entrada:
@@ -349,15 +285,11 @@ def getRow(database,table,id_name,id_value):
 	#		id_value - string - valor a buscar
 	# 	Regresa:
 	#		dict - valores retornados
-
-	con = lite.connect(database)
-	con.row_factory = lite.Row #
-	cur = con.cursor()
-	cur.execute('SELECT * FROM {0} WHERE {1} = {2}'.format(table,id_name,id_value))
-	row = cur.fetchone()
-	row=dict(zip(row.keys(), row)) 
-	con.close()
-	return row
+	if id_value==None:
+		sql='SELECT * FROM {} LIMIT 1'.format(table)
+	else:
+		sql='SELECT * FROM {} WHERE {} = {} LIMIT 1'.format(table,id_name,id_value)
+	return getRowSql(database,sql)
 
 def getRowSql(database,sql):
 	# 	Función:
@@ -367,7 +299,6 @@ def getRowSql(database,sql):
 	#		sql: string <- query que genera la búsqueda
 	# 	Regresa:
 	#		dict - valores retornados
-
 	con = lite.connect(database)
 	con.row_factory = lite.Row #
 	cur = con.cursor()
@@ -377,23 +308,6 @@ def getRowSql(database,sql):
 	con.close()
 	return row
 
-def getTable(database,table):
-	# 	Función:
-	#	 	Obtiene todos los datos de una base de datos SQLite
-	# 	Entrada:
-	#		database: str <- nombre de la base de datos
-	#		table: str <- nombre de la tabla
-	# 	Regresa:
-	#		list - valores retornados DEBERIA ser dict
-
-	con = lite.connect(database)
-	cur = con.cursor()
-	res=sql='SELECT * FROM {0}'.format(table)
-	cur.execute(sql)
-	rows = cur.fetchall()
-	if con: con.close()
-	return rows
-
 def tableList(database):
 	# 	Función:
 	# 		Obtiene lista de tablas en una base de datos SQLite
@@ -401,7 +315,6 @@ def tableList(database):
 	# 		database: string <- nombre de la base de datos
 	# 	Regresa:
 	# 		tuple: valores retornados
-
 	con = lite.connect(database)
 	cur = con.cursor()
 	cur.execute("select name from sqlite_master where type='table' and name!='sqlite_sequence'")
@@ -421,9 +334,8 @@ def insertRow(database,table,data):
 	# 		database: str <- nombre de la base de datos
 	# 		table: str <- nombre de la tabla
 	# 		data: dict <- datos en forma de pares key-value
-	# Regresa:
+	# 	Regresa:
 	# 		bool: True si se ingresó el dato correctamente
-
 	res = True
 	keys=data.keys()
 	tmp=''
@@ -456,7 +368,6 @@ def changeRowId(database,table,old_id,new_id):
 	# 		new_id: integer <- id nuevo
 	# 	Regresa:
 	# 		bool: True si se ingresó el dato correctamente OJO::: hay que revisar
-
 	res = True
 	con = lite.connect(database)
 	with con:
@@ -472,14 +383,13 @@ def changeRowId(database,table,old_id,new_id):
 
 def updateRow(database,table,data): 
 	# 	Función: 
-	# 		cambia el id  a una línea de datos de una base de datos SQLite
+	# 		cambia los datos de una fila en una tabla
 	# 	Entrada:
 	# 		database: str <- nombre de la base de datos
 	# 		table: str <- nombre de la tabla
 	#		data: dict <- data en forma de pares key-value
 	# 	Regresa:
 	# 		bool: True si se ingresó el dato correctamente OJO::: hay que revisar
-
 	res = True
 	keys=data.keys()
 	subs=''
@@ -499,104 +409,81 @@ def updateRow(database,table,data):
 	return res
 
 def deleteRow(database,table,id_name,id_value):
-#
-# Descripción: Borra una línea de datos de una base de datos SQLite
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-# 	id_value - string - valor a buscar
-# Regresa:
-# 	bool - True si se ingresó el dato correctamente
-#
+	# 	Función:
+	#		Borra una fila de datos de una tabla
+	# 	Entrada:
+	# 		database - string - nombre de la base de datos
+	# 		table    - string - nombre de la tabla
+	# 		id_name  - string - nombre de la columna de apuntador normalmente 'id'
+	# 		id_value - string - valor a buscar
+	# 	Regresa:
+	# 		bool - True si se ingresó el dato correctamente
 	con = lite.connect(database)
 	cur = con.cursor()
 	cur.execute('DELETE FROM {} WHERE {} = {}'.format(table,id_name,id_value))
 	con.commit()
 	con.close()
 
-def maxId(database,table,id_name):
-#
-# Descripción: Devuelve el máximo valor de la columna en una base de datos SQLite
-# Notas: sólo funciona para valores enteros
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-# Regresa:
-#	int - valor máximo
-#
-	con = lite.connect(database)
-	with con:
-		cur = con.cursor()
-		cur.execute('SELECT MAX({}) FROM {}'.format(id_name,table))
-		res=cur.fetchone()
-		if res[0]==None:
-			res=[0]
-	if con: con.close()
-	return int(res[0])
+def maxId(database,table,id_name): #OJO se puede implementar con getRowSql
+	# 	Descripción: Devuelve el máximo valor de la columna en una base de datos SQLite
+	# 		Notas: sólo funciona para valores enteros
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		table    - string - nombre de la tabla
+	#		id_name  - string - nombre de la columna de apuntador normalmente 'id'
+	# 	Regresa:
+	#		int - valor máximo
+	res=getRowSql(database,'SELECT MAX({}) AS max FROM {}'.format(id_name,table)).get('max',0)
+	if res==None: res=0
+	return res
 
-
-def recordExist(database,table,id_name,id_value):
-#
-# Descripción: Verifica que un registro exista en una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-#	id_name  - string - nombre de la columna de apuntador normalmente 'id'
-#	id_value - string - valor a buscar
-# Regresa:
-#	bool - True si existe
-#
+def recordExist(database,table,id_name,id_value): #OJO se puede implementar con getRowSql
+	# 	Descripción: Verifica que un registro exista en una base de datos SQLite
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		table    - string - nombre de la tabla
+	#		id_name  - string - nombre de la columna de apuntador normalmente 'id'
+	#		id_value - string - valor a buscar
+	# 	Regresa:
+	#		bool - True si existe
 	res=False
-	con = lite.connect(database)
-	cur = con.cursor()
-	sql='select count(id) from {} where {} = {}'.format(table,id_name,id_value)
-	#input(sql)
-	cur.execute(sql)
-	if cur.fetchone()[0]>0:
+	count=getRowSql(database,'SELECT COUNT(id) AS count FROM {} WHERE {} = {}'.format(table,id_name,id_value)).get('count')
+	if count>0:
 		res=True
-	con.close()
 	return res
 
 def defragmentTable(database,table):
-#
-# Descripción: Obtiene todos los datos de una base de datos SQLite
-# Entrada:
-#	database - string - nombre de la base de datos
-#	table    - string - nombre de la tabla
-# Regresa:
-#	list - valores retornados DEBERIA ser dict
-#
+	# 	Función: 
+	#		'Defragmenta' la tabla poniendo todos los id consecutivos
+	# 	Entrada:
+	#		database: str <- nombre de la base de datos
+	#		table: str <- nombre de la tabla
 	con = lite.connect(database)
 	cur = con.cursor()
 	sql='SELECT id FROM {}'.format(table)
 	cur.execute(sql)
 	rows = cur.fetchall()
-	if con: con.close()
+	con.close()
 	i=1
 	for r in rows:
-		#print(r[0])
 		if r[0]!=i:
 			changeRowId(database,table,r[0],i)
 		i+=1
-	return rows
 
 def insertEmptyRow(database,table,id):
 	pass
 
-def exportCsv(database,table,filename='out.csv'):
-#
-# Descripción: exporta una tabla especificada a  un archivo delimitado por comas CSV
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	filename - string - nombre del archivo a importar
-# Regresa:
-# 	DEBERIA regresar bool - True si se cargó sin problemas el archivo
-# Pendientes:
-#	validar si el archivo existe, número de registros cargados, etc
-#
+def exportCsv(database,table,filename='out.csv'): #EXPERIMENTAL!!!
+	# Función: 
+	#	Exporta una tabla especificada a  un archivo delimitado por comas CSV
+	# Entrada:
+	# 	database: str <- nombre de la base de datos
+	# 	table: str <- nombre de la tabla
+	# 	filename: str <- nombre del archivo a importar
+	# Regresa:
+	# 	DEBERIA regresar bool - True si se cargó sin problemas el archivo
+	# Pendientes:
+	#	validar si el archivo existe, número de registros cargados, etc
 	con = lite.connect(database)
 	con.row_factory = lite.Row
 	cur = con.cursor()
@@ -619,18 +506,17 @@ def exportCsv(database,table,filename='out.csv'):
 		fic.write(tmp)
 	fic.close()
 
-def importCsv(database,table,filename):
-#
-# Descripción: importa un archivo delimitado por comas CSV a la base de datos y tabla especificada
-# Entrada:
-# 	database - string - nombre de la base de datos
-# 	table    - string - nombre de la tabla
-# 	filename - string - nombre del archivo a importar
-# Regresa:
-# 	DEBERIA regresar bool - True si se cargó sin problemas el archivo
-# Pendientes:
-#	validar si el archivo existe, número de registros cargados, etc
-#
+def importCsv(database,table,filename): #EXPERIMENTAL!!!
+	# 	Función: 
+	#		importa un archivo delimitado por comas CSV a la base de datos y tabla especificada
+	# 	Entrada:
+	# 		database: str <- nombre de la base de datos
+	# 		table: str <- nombre de la tabla
+	# 		filename: str <- nombre del archivo a importar
+	# 	Regresa:
+	# 		DEBERIA regresar bool - True si se cargó sin problemas el archivo
+	# 	Pendientes:
+	#		validar si el archivo existe, número de registros cargados, etc
 	fic = open(filename, "r")
 	lines = fic.readlines()
 	fic.close()
@@ -651,50 +537,6 @@ def importCsv(database,table,filename):
 				data['id']=str(maxId(database,table)+1)
 			print(data)
 			insertRow(database,table,data)
-
-def modificarRegistro(id_name,id_value,style):
-	Descripcion='''
-	Modifica un registro preguntando valores
-	Entrada:
-		database - string - nombre de la base de datos
-		table    - string - nombre de la tabla
-		id_name  - string - nombre de la columna apuntador normalmente 'id'
-		id_value - string - valor a modificar
-	Regresa:
-		DEBERIA regresar bool - True si se modificó
-	'''
-	database=style['database']
-	table=style['table']
-
-	if recordExist(database,table,id_name,id_value):
-		row=getRow(database,table,id_name,id_value)
-		data={}
-		for c in row.keys():
-			cStyle=style.get('columns',{}).get(c,{'type':'str'})
-			while True:
-				caption=cStyle.get('caption',c)
-				helper=cStyle.get('helper','')
-
-				if row[c]==None: row[c]=''
-
-				if cStyle.get('enabled',True):
-					tmp=input('{} : {} [{}]='.format(caption,helper,row[c]))
-				else:
-					print('{} : {}'.format(caption,row[c]))
-					data[c]=str(row[c])
-					break
-				if tmp=='': tmp=row[c]
-				res, tmp, msg=validateInput(tmp,cStyle)
-				if msg!='':print(msg)
-				if res:
-					data[c]=tmp 
-					break
-
-		updateRow(database,table,data)
-		consoleMsgBox('ok','Registro actualizado')
-	else:
-		consoleMsgBox('error','El registro id={} NO EXISTE'.format(id_value))
-
 
 def validateInput(value,params={'type':'str'}):
 	res=True
