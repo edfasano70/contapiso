@@ -1,5 +1,13 @@
 Pendientes:
 
+nombre?
+
+eliminar los errores de despliegue en la terminal de windows
+
+implementar funcion getSql() a partir de getRowSql()... esta va a regresar toda la tabla a partir de un query
+
+incorporar CURSES
+
 terminar de arreglar archivo json <-en curso
 
 terminar con la implementacion de csv

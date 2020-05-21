@@ -23,7 +23,7 @@
             },
             "tipo": {
                 "type": "str",
-                "caption": "tipo",
+                "caption": "TIPO",
                 "helper": "tipo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -34,7 +34,7 @@
             },
             "codigo": {
                 "type": "str",
-                "caption": "codigo",
+                "caption": "CODIGO",
                 "helper": "codigo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -45,18 +45,18 @@
             },
             "fecha": {
                 "type": "str",
-                "caption": "fecha",
-                "helper": "fecha",
+                "caption": "FECHA",
+                "helper": "En formato DDMMAAAA",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789/-",
+                "allowedChars": "0123456789",
                 "visible": true,
                 "enabled": true
             },
             "descripcion": {
                 "type": "str",
-                "caption": "descripcion",
+                "caption": "DESCRIPCION",
                 "helper": "descripcion",
                 "capitalize": "upper",
                 "lenght_min": null,
@@ -67,7 +67,7 @@
             },
             "debe": {
                 "type": "float",
-                "caption": "debe",
+                "caption": "DEBE(Bs)",
                 "helper": "debe",
                 "capitalize": null,
                 "lenght_min": null,
@@ -81,7 +81,7 @@
             },
             "haber": {
                 "type": "float",
-                "caption": "haber",
+                "caption": "HABER(Bs)",
                 "helper": "haber",
                 "capitalize": null,
                 "lenght_min": null,
@@ -98,7 +98,7 @@
     "locales": {
         "database": "condominio.db3",
         "table": "locales",
-        "caption": "locales",
+        "caption": "EDIFICIO GALERIAS MIRANDA\nLOCALES COMERCIALES\n",
         "sql": "SELECT * FROM locales",
         "header": "",
         "footer": "",
@@ -119,7 +119,7 @@
             },
             "codigo": {
                 "type": "str",
-                "caption": "codigo",
+                "caption": "CODIGO",
                 "helper": "codigo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -130,7 +130,7 @@
             },
             "piso": {
                 "type": "str",
-                "caption": "piso",
+                "caption": "PISO",
                 "helper": "piso",
                 "capitalize": null,
                 "lenght_min": null,
@@ -141,7 +141,7 @@
             },
             "local": {
                 "type": "str",
-                "caption": "local",
+                "caption": "LOCAL(ES)",
                 "helper": "local",
                 "capitalize": null,
                 "lenght_min": null,
@@ -152,7 +152,7 @@
             },
             "propietario": {
                 "type": "str",
-                "caption": "propietario",
+                "caption": "PROPIETARIO",
                 "helper": "propietario",
                 "capitalize": null,
                 "lenght_min": null,
@@ -163,7 +163,7 @@
             },
             "inquilino": {
                 "type": "str",
-                "caption": "inquilino",
+                "caption": "INQUILINO",
                 "helper": "inquilino",
                 "capitalize": null,
                 "lenght_min": null,
@@ -174,7 +174,7 @@
             },
             "alicuota": {
                 "type": "float",
-                "caption": "alicuota",
+                "caption": "ALICUOTA(%)",
                 "helper": "alicuota",
                 "capitalize": null,
                 "lenght_min": null,
@@ -188,7 +188,7 @@
             },
             "saldo": {
                 "type": "float",
-                "caption": "saldo",
+                "caption": "SALDO(Bs)",
                 "helper": "saldo",
                 "capitalize": null,
                 "lenght_min": null,
@@ -202,7 +202,7 @@
             },
             "contacto_nombre": {
                 "type": "str",
-                "caption": "contacto_nombre",
+                "caption": "CONTACTO",
                 "helper": "contacto_nombre",
                 "capitalize": null,
                 "lenght_min": null,
@@ -213,7 +213,7 @@
             },
             "contacto_tlf": {
                 "type": "str",
-                "caption": "contacto_tlf",
+                "caption": "TLF",
                 "helper": "contacto_tlf",
                 "capitalize": null,
                 "lenght_min": null,
@@ -224,7 +224,7 @@
             },
             "contacto_email": {
                 "type": "str",
-                "caption": "contacto_email",
+                "caption": "eMAIL",
                 "helper": "contacto_email",
                 "capitalize": null,
                 "lenght_min": null,
@@ -238,7 +238,7 @@
     "gastos": {
         "database": "condominio.db3",
         "table": "gastos",
-        "caption": "gastos",
+        "caption": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
         "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
         "header": "",
         "footer": "",
@@ -326,8 +326,8 @@
                 "lenght_min": null,
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
-                "visible": true,
-                "enabled": true,
+                "visible": false,
+                "enabled": false,
                 "decimal_places":2
             }
         }
