@@ -393,6 +393,11 @@ def opcionExportar():
 		if table[0:6]=='gastos':
 			views.pop(table)
 
+res=getRowSql(DATABASE,'select * from gastos where id=2')
+for r in res:print(r)
+input('press ENTER')
+
+
 try:
 	with open(iniFile) as file: views = json.load(file)
 except:

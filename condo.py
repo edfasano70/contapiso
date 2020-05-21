@@ -308,6 +308,26 @@ def getRowSql(database,sql):
 	con.close()
 	return row
 
+def getQuery(database,sql):
+	# 	Función:
+	# 		Obtiene una tabla de resultados de una base de datos SQLite mediante un query
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		sql: string <- query que genera la búsqueda
+	# 	Regresa:
+	#		dict - valores retornados
+	data=[]
+	con = lite.connect(database)
+	con.row_factory = lite.Row #
+	cur = con.cursor()
+	cur.execute(sql)
+	tmp=cur.fetchall()
+	con.close()
+	for r in tmp:	
+		row=dict(zip(r.keys(), r))
+		data.append(row)
+	return data
+
 def tableList(database):
 	# 	Función:
 	# 		Obtiene lista de tablas en una base de datos SQLite
