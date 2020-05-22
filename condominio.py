@@ -4,14 +4,14 @@
 
 from condo import *
 
-INIFILE='condominio.json'
-DATABASE='condominio.db3'
-VERSION='0.1 alpha'
+INIFILE 	=	'condominio.json'
+DATABASE 	=	'condominio.db3'
+VERSION 	=	'0.1 alpha'
 
-iniFile=INIFILE
-database=DATABASE
-table='locales'
-period='012020'
+iniFile 	= 	INIFILE
+database 	=	DATABASE
+table 		=	'locales'
+period 		=	'012020'
 
 def tableSelector():
 	#	Función:

@@ -4,7 +4,7 @@
 
 nombre?
 
-crear función consoleInput()
+pasar todos los nombres a ingles o español <-DECIDETE!!!
 
 eliminar los errores de despliegue en la terminal de windows
 
@@ -39,3 +39,5 @@ al crear nuevo periodo generar estructura de directorios
 > implementar funcion getSql() a partir de getRowSql()... esta va a regresar toda la tabla a partir de un query
 > introducir validacion de numeros con minimo y maximo
 > terminar de arreglar archivo json <-en curso
+> crear función consoleInput()
+
