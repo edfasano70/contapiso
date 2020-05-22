@@ -152,9 +152,10 @@ def manejoTablas():
 			else:
 				print(rl+Style.RESET_ALL)
 
-		print('\n'+views[table].get('footer','EoT\n'))
+		print('\n'+views[table].get('footer','FdlT\n'))
 
-		tmp=input('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar >> '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL)).upper()
+		print('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar >> '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL),end='')
+		tmp=input().upper()
 		
 		command=tmp.split(' ')
 		opcion=command[0]
@@ -393,11 +394,6 @@ def opcionExportar():
 		if table[0:6]=='gastos':
 			views.pop(table)
 
-res=getRowSql(DATABASE,'select * from gastos where id=2')
-for r in res:print(r)
-input('press ENTER')
-
-
 try:
 	with open(iniFile) as file: views = json.load(file)
 except:
@@ -434,7 +430,7 @@ while True:
 
 clear()
 
-if input('[ ?? ] : Guardar cambios en Configuración? (s/n)' ).upper()=='S':
+if consoleInput('Guardar cambios en Configuración? (s/n)').upper()=='S':
 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
 	fic = open(iniFile, "w")
 	fic.write(json.dumps(views,indent=4))

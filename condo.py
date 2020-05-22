@@ -21,6 +21,20 @@ def clear():
 	else:
 		os.system("clear")
 
+def consoleInput(msg,type='str'):
+	# 	Función:
+	# 		Solicita un dato por consola
+	# 	Entradas:
+	# 		type: str <- str, int, float, date <-pendiente de momento
+	# 		msg: str <- mensaje a desplegar
+	# 	Salidas:
+	# 		value: resultado 
+	cs=Style.BRIGHT+Fore.GREEN
+	icon='[ ? ]'
+	print(cs+icon+Style.RESET_ALL+' : '+msg+' ',end='')
+	value=input()
+	return value
+
 def consoleMsgBox(type,msg,enter=False):
 	# 	Función:
 	# 		Imprime mensaje tipo "alertBox" por consola
@@ -33,13 +47,13 @@ def consoleMsgBox(type,msg,enter=False):
 	cs=Style.BRIGHT
 	if type=='ok':
 		cs+=Fore.GREEN
-		icon='[ ok ]'
+		icon='[ > ]'
 	elif type=='error':
 		cs+=Fore.RED
-		icon='[ !! ]'
+		icon='[ X ]'
 	elif type=='alert':
 		cs+=Fore.YELLOW
-		icon='[ !! ]'
+		icon='[ A ]'
 	else:
 		cs=''
 	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')
@@ -308,6 +322,8 @@ def getRowSql(database,sql):
 	con.close()
 	return row
 
+	#getRowSql() pasaría a ser getQuery()[0]
+
 def getQuery(database,sql):
 	# 	Función:
 	# 		Obtiene una tabla de resultados de una base de datos SQLite mediante un query
@@ -328,7 +344,7 @@ def getQuery(database,sql):
 		data.append(row)
 	return data
 
-def tableList(database):
+def tableList(database): #se puede hacer con getQuery()
 	# 	Función:
 	# 		Obtiene lista de tablas en una base de datos SQLite
 	# 	Entrada:
@@ -444,7 +460,7 @@ def deleteRow(database,table,id_name,id_value):
 	con.commit()
 	con.close()
 
-def maxId(database,table,id_name): #OJO se puede implementar con getRowSql
+def maxId(database,table,id_name): 
 	# 	Descripción: Devuelve el máximo valor de la columna en una base de datos SQLite
 	# 		Notas: sólo funciona para valores enteros
 	# 	Entrada:
@@ -457,7 +473,7 @@ def maxId(database,table,id_name): #OJO se puede implementar con getRowSql
 	if res==None: res=0
 	return res
 
-def recordExist(database,table,id_name,id_value): #OJO se puede implementar con getRowSql
+def recordExist(database,table,id_name,id_value): 
 	# 	Descripción: Verifica que un registro exista en una base de datos SQLite
 	# 	Entrada:
 	#		database - string - nombre de la base de datos
@@ -565,8 +581,7 @@ def validateInput(value,params={'type':'str'}):
 	if type=='str':
 		value=str(value)
 		#verificamos los caracteres permitidos
-		allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ '
-
+		allowed_chars=params.get('allowed_chars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ')
 		tmp=value.upper()
 		tmp2=''
 		tmp3=''
@@ -578,8 +593,7 @@ def validateInput(value,params={'type':'str'}):
 				tmp2+=value[i]
 
 		value=tmp2
-
-		if tmp3!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> {}'.format(tmp3))
+		if tmp3!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp3))
 
 		#verificamos capitalización
 		if params.get('capitalize',None)=='upper':
@@ -588,20 +602,73 @@ def validateInput(value,params={'type':'str'}):
 			value=value.lower()
 		elif params.get('capitalize',None)=='capitalize':
 			value=value.capitalize()
+
 		#verificamos longitud minima y maxima
-		if params.get('lenght_min',0)!=None:
-			if len(value)<params.get('lenght_min',0):
+		lenght_min=params.get('lenght_min',None)
+		lenght_max=params.get('lenght_max',None)
+		if lenght_min!=None:
+			if len(value)<lenght_min: #,0):
 				res=False
 				consoleMsgBox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
-		if params.get('lenght_max',100)!=None:
-			if len(value)>params.get('lenght_max',100):
-				value=value[0:params.get('lenght_max',100)]
+		if lenght_max!=None:
+			if len(value)>lenght_max: #,100):
+				value=value[0:lenght_max] #,100)]
 				consoleMsgBox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
 
 	elif type=='int':
-		pass
+		value=str(value)
+		#verificamos los caracteres permitidos
+		allowed_chars='0123456789'
+		tmp=''
+		for i in range(0,len(value)):
+			if value[i] not in allowed_chars:
+				res=False
+				tmp+=value[i]
+		if tmp!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
+
+		if res:
+			value=int(value)
+			#verificamos valor mínimo y máximo
+			value_min=params.get('min',None)
+			value_max=params.get('max',None)
+			if value_min!=None:
+				if value<value_min: #,0):
+					res=False
+					consoleMsgBox('error','Por debajo del valor mínimo [{}]'.format(value_min))
+			if value_max!=None:
+				if value>value_max: #,100):
+					res=False
+					consoleMsgBox('error','Supera el valor máximo [{}]'.format(value_max))
+			
 	elif type=='float':
-		pass
+		value=str(value)
+		#verificamos los caracteres permitidos
+		allowed_chars='0123456789.'
+		tmp=''
+		for i in range(0,len(value)):
+			if value[i] not in allowed_chars:
+				res=False
+				tmp+=value[i]
+		if tmp!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
+
+		#verificamos que exista 1 '.' como máximo
+		if value.count('.')>1:
+			res=False
+			consoleMsgBox('error','Formato numérico ERRONEO'.format(tmp3))			
+		if res:
+			value=float(value)
+			#verificamos valor minimo y maximo
+			value_min=params.get('min',None)
+			value_max=params.get('max',None)
+			if value_min!=None:
+				if value<value_min: #,0):
+					res=False
+					consoleMsgBox('error','Por debajo del valor mínimo [{}]'.format(value_min))
+			if value_max!=None:
+				if value>value_max: #,100):
+					res=False
+					consoleMsgBox('error','Supera el valor máximo [{}]'.format(value_max))
+				
 	elif type=='date':
 		pass
 	elif type=='bool':

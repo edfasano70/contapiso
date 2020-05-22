@@ -2,9 +2,9 @@
     "libro": {
         "database": "condominio.db3",
         "table": "libro",
-        "caption": "Libro Diario",
+        "caption": "LIBRO DIARIO",
         "sql": "SELECT * FROM libro",
-        "header": "EDIFICIO GALERIAS MIRANDA\nLibro Diario\n",
+        "header": "EDIFICIO GALERIAS MIRANDA\nLIBRO DIARIO\n",
         "footer": "FdlT",
         "columns": {
             "id": {
@@ -80,7 +80,7 @@
                 "max": null
             },
             "haber": {
-                "type": "float",
+                "type": "int",
                 "caption": "HABER(Bs)",
                 "helper": "haber",
                 "capitalize": null,
@@ -98,10 +98,10 @@
     "locales": {
         "database": "condominio.db3",
         "table": "locales",
-        "caption": "EDIFICIO GALERIAS MIRANDA\nLOCALES COMERCIALES\n",
+        "caption": "LOCALES COMERCIALES",
         "sql": "SELECT * FROM locales",
-        "header": "",
-        "footer": "",
+        "header": "EDIFICIO GALERIAS MIRANDA\nLOCALES COMERCIALES\n",
+        "footer": "FdlT",
         "columns": {
             "id": {
                 "type": "int",
@@ -238,10 +238,10 @@
     "gastos": {
         "database": "condominio.db3",
         "table": "gastos",
-        "caption": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
+        "caption": "GASTOS DEL PERIODO",
         "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
-        "header": "",
-        "footer": "",
+        "header": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
+        "footer": "FdlT",
         "columns": {
             "id": {
                 "type": "int",

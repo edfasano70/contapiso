@@ -1,19 +1,20 @@
-Pendientes:
+***************
+* Pendientes: *
+***************
 
 nombre?
 
+crear función consoleInput()
+
 eliminar los errores de despliegue en la terminal de windows
 
-implementar funcion getSql() a partir de getRowSql()... esta va a regresar toda la tabla a partir de un query
+cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
 
 incorporar CURSES
-
-terminar de arreglar archivo json <-en curso
 
 terminar con la implementacion de csv
 	para otras versiones: trabajar con formato xlsx
 
-introducir validacion de numeros con minimo y maximo
 introducir validacion de fecha
 determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
@@ -29,6 +30,12 @@ crear estructura de directorios
 
 al crear nuevo periodo generar estructura de directorios
 
-Hechas:
-determinar si DATABASE es global <-en proceso
-cambiar menu selector de tablas por el nuevo menú <-verificar
+***********
+* Hechas: *
+***********
+
+> determinar si DATABASE es global <-en proceso
+> cambiar menu selector de tablas por el nuevo menú <-verificar
+> implementar funcion getSql() a partir de getRowSql()... esta va a regresar toda la tabla a partir de un query
+> introducir validacion de numeros con minimo y maximo
+> terminar de arreglar archivo json <-en curso
