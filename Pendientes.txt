@@ -4,6 +4,10 @@
 
 nombre?
 
+implementación de pipenv
+
+test de creación de exec
+
 pasar todos los nombres a ingles o español <-DECIDETE!!!
 
 eliminar los errores de despliegue en la terminal de windows
@@ -40,4 +44,6 @@ al crear nuevo periodo generar estructura de directorios
 > introducir validacion de numeros con minimo y maximo
 > terminar de arreglar archivo json <-en curso
 > crear función consoleInput()
+> implementación de __name__
+
 

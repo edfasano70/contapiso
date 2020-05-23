@@ -179,7 +179,6 @@ def manejoTablas():
 				id=int(input('[?] Ingrese ID del registro a MODIFICAR > '))
 			else:
 				id=opPar
-#			ModificarRegistro('id',id,views[table])
 			newModificarRegistro('id',id)
 
 		elif opcion=='B':
@@ -234,9 +233,7 @@ def validateViews():
 
 	for t in tmp:
 		assignValue2Key(views,t,{})
-
 		vt=views[t]
-		#assignValue2Key(vt,'database',DATABASE)
 		assignValue2Key(vt,'table',t)
 		assignValue2Key(vt,'caption',t)
 		assignValue2Key(vt,'sql','SELECT * FROM {}'.format(t))
@@ -255,7 +252,6 @@ def validateViews():
 
 		for c in columns:
 			assignValue2Key(vt_c,c,{'type':'str'})
-
 			vt_c2=vt_c[c]
 			assignValue2Key(vt_c2,'caption',c)
 			assignValue2Key(vt_c2,'helper',c)
@@ -392,58 +388,65 @@ def opcionExportar():
 		if table[0:6]=='gastos':
 			views.pop(table)
 
-try:
-	with open(DATABASE+'.json') as file: views = json.load(file)
-except:
-	consoleMsgBox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
-	# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
-	views={}
+def main():
+	global DATABASE,table,period,views
+	try:
+		with open(DATABASE+'.json') as file: views = json.load(file)
+	except:
+		consoleMsgBox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
+		# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
+		views={}
 
-#viewOld=views.copy()
+	#viewOld=views.copy()
 
-validateViews()
+	validateViews()
 
-while True:
+	while True:
+		clear()
+		say(
+			'KaiKei',
+			font="slick",
+			align='left'
+		)
+		dummy='GESTION DE CONDOMINIO ver. {}'.format(VERSION)
+		print(dummy)
+		print('='*len(dummy))
+
+		menu1=[]
+		menu1.append(['Datos','opcionTablas()'])
+		menu1.append(['Tablas',"consoleMenu('Tablas',menu2)"])
+		menu1.append(['Período','opcionPeriodo()'])
+		menu1.append(['Reportes','opcionReportes()'])
+
+		menu2=[]
+		menu2.append(['Importar','opcionImportar()'])
+		menu2.append(['Exportar','opcionExportar'])
+		
+		if consoleMenu('Opciones',menu1): break
+
 	clear()
-	say(
-		'KaiKei',
-		font="slick",
-		align='left'
-	)
-	dummy='GESTION DE CONDOMINIO ver. {}'.format(VERSION)
-	print(dummy)
-	print('='*len(dummy))
 
-	menu1=[]
-	menu1.append(['Datos','opcionTablas()'])
-	menu1.append(['Tablas',"consoleMenu('Tablas',menu2)"])
-	menu1.append(['Período','opcionPeriodo()'])
-	menu1.append(['Reportes','opcionReportes()'])
-
-	menu2=[]
-	menu2.append(['Importar','opcionImportar()'])
-	menu2.append(['Exportar','opcionExportar'])
-	
-	if consoleMenu('Opciones',menu1): break
-
-clear()
-
-if consoleInput('Guardar cambios en Configuración? (s/n)').upper()=='S':
-	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
-	fic = open(DATABASE+'.json', "w")
-	fic.write(json.dumps(views,indent=4))
-	fic.close()
+	if consoleInput('Guardar cambios en Configuración? (s/n)').upper()=='S':
+		consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
+		fic = open(DATABASE+'.json', "w")
+		fic.write(json.dumps(views,indent=4))
+		fic.close()
 
 
-# if views==viewOld:
-# 	consoleMsgBox('ok','SIN cambios en archivo Json')
-# else:
-# 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
-# 	fic = open(iniFile, "w")
-# 	fic.write(json.dumps(views,indent=4))
-# 	fic.close()
+	# if views==viewOld:
+	# 	consoleMsgBox('ok','SIN cambios en archivo Json')
+	# else:
+	# 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
+	# 	fic = open(iniFile, "w")
+	# 	fic.write(json.dumps(views,indent=4))
+	# 	fic.close()
 
-consoleMsgBox('ok','Bye!\n')
+	consoleMsgBox('ok','Bye!\n')
+
+if __name__ == '__main__':
+	main()
+else:
+	consoleMsgBox('error','Este programa no puede ser llamado como módulo\n')
+	consoleMsgBox('ok','Bye!\n')
 sys.exit()
-
 

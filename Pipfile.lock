@@ -1,0 +1,52 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "0d84b3c43683e31a47b01e46a5dcb3b758d423c3bb5392c19a3af54fb9603b8f"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.8"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "colorama": {
+            "hashes": [
+                "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff",
+                "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"
+            ],
+            "index": "pypi",
+            "version": "==0.4.3"
+        },
+        "fpdf": {
+            "hashes": [
+                "sha256:125840783289e7d12552b1e86ab692c37322e7a65b96a99e0ea86cca041b6779"
+            ],
+            "index": "pypi",
+            "version": "==1.7.2"
+        },
+        "python-cfonts": {
+            "hashes": [
+                "sha256:03c1cbd31017d179555741e0889bd5715b62a126d025cf158672671c73b3b3ab",
+                "sha256:430c354e28492f2da1c5cde86066f2754415db657024e6ec41201064acd18e69"
+            ],
+            "index": "pypi",
+            "version": "==1.3.0"
+        },
+        "yagmail": {
+            "hashes": [
+                "sha256:a055d78eca8846bee8329b1bd337599b0b09462d4d24471fba44db30dbfec03f",
+                "sha256:ca5ff7eee3c190eedd7cbdf05bff69c5c0ae357aef64f89dcc42e4872c6ebe7c"
+            ],
+            "index": "pypi",
+            "version": "==0.11.224"
+        }
+    },
+    "develop": {}
+}
