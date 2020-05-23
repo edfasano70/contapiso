@@ -4,12 +4,10 @@
 
 from condo import *
 
-INIFILE 	=	'condominio.json'
-DATABASE 	=	'condominio.db3'
+INIFILE 	=	__name__.replace('_','')+'.json'
+DATABASE 	=	'database/condominio.db3'
 VERSION 	=	'0.1 alpha'
 
-iniFile 	= 	INIFILE
-database 	=	DATABASE
 table 		=	'locales'
 period 		=	'012020'
 
@@ -145,7 +143,7 @@ def manejoTablas():
 		print(header+'\n')
 
 		firstRow=True
-		for rl in renderTableAuto(views[table]):
+		for rl in renderTableAuto(DATABASE,views[table]):
 			if firstRow: 
 				print(Style.BRIGHT+rl+Style.RESET_ALL)
 				firstRow=False
@@ -238,7 +236,7 @@ def validateViews():
 		assignValue2Key(views,t,{})
 
 		vt=views[t]
-		assignValue2Key(vt,'database',DATABASE)
+		#assignValue2Key(vt,'database',DATABASE)
 		assignValue2Key(vt,'table',t)
 		assignValue2Key(vt,'caption',t)
 		assignValue2Key(vt,'sql','SELECT * FROM {}'.format(t))
@@ -247,9 +245,9 @@ def validateViews():
 		assignValue2Key(vt,'columns',{})
 
 		columns=[]
-		for c in getRow(vt.get('database'),vt.get('table'),'id',1).keys():
+		for c in getRow(DATABASE,vt.get('table'),'id',1).keys():
 			columns.append(c)
-		for c in getRowSql(vt.get('database'),vt.get('sql')).keys():
+		for c in getRowSql(DATABASE,vt.get('sql')).keys():
 			if c not in columns:
 				columns.append(c)
 
@@ -395,9 +393,9 @@ def opcionExportar():
 			views.pop(table)
 
 try:
-	with open(iniFile) as file: views = json.load(file)
+	with open(DATABASE+'.json') as file: views = json.load(file)
 except:
-	consoleMsgBox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(iniFile),True)
+	consoleMsgBox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
 	# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
 	views={}
 
@@ -432,7 +430,7 @@ clear()
 
 if consoleInput('Guardar cambios en Configuración? (s/n)').upper()=='S':
 	consoleMsgBox('alert','GUARDANDO cambios en el archivo Json')
-	fic = open(iniFile, "w")
+	fic = open(DATABASE+'.json', "w")
 	fic.write(json.dumps(views,indent=4))
 	fic.close()
 

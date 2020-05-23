@@ -121,7 +121,7 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 				res.append('Propietario : {}'.format(propietario))
 				if propietario!=inquilino: res.append('Inquilino   : {}'.format(inquilino))
 
-				report_lines=renderTableAuto(database,'gastos',params)
+				report_lines=renderTableAuto(database,params)
 
 				max_width=0
 				firstRow=True
@@ -185,20 +185,20 @@ def generarReporte(database,inicio,cantidad,output='console',input_file='',outpu
 		else:
 			pass
 
-def renderTableAuto(params):
+def renderTableAuto(database,params):
 	#	Función:
 	# 		Genera el código para imprimir una tabla
  	#	Entrada:
  	#		params: dict <-contiene todos los parámetros para generar la tabla
-	#			database: string <- nombre de la base de datos
-	#			table: string <- nombre de la tabla
+	#			database: string <- nombre de la base de datos  <-no
+	#			table: string <- nombre de la tabla <- no
 	#			style: dict <- tiene todos los parámetros que dibujan la tabla
 	#	Regresa:
 	#		string <- con todo el codigo para mostrar la tabla
  	#	Pendiente:
  	#		validar errores
  	#		opción html
-	database=params.get('database')
+	#database=params.get('database')
 	table=params.get('table')
 	sql=params.get('sql','SELECT * FROM {}'.format(table))
 	con = lite.connect(database)
