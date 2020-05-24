@@ -47,13 +47,13 @@ def consoleMsgBox(type,msg,enter=False):
 	cs=Style.BRIGHT
 	if type=='ok':
 		cs+=Fore.GREEN
-		icon='[ > ]'
+		icon='[ → ]'
 	elif type=='error':
 		cs+=Fore.RED
 		icon='[ X ]'
 	elif type=='alert':
 		cs+=Fore.YELLOW
-		icon='[ A ]'
+		icon='[ ! ]'
 	else:
 		cs=''
 	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')

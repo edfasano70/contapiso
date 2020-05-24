@@ -38,7 +38,7 @@ def tableSelector():
 		i+=1
 		print(i,'·',p[0])
 	error=False
-	sel=input('\n>> ')
+	sel=input('\n» ')
 	if sel=='': sel=0
 	try:
 		sel=int(sel)
@@ -152,7 +152,7 @@ def manejoTablas():
 
 		print('\n'+views[table].get('footer','FdlT\n'))
 
-		print('>>> {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar >> '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL),end='')
+		print('» {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar » '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL),end='')
 		tmp=input().upper()
 		
 		command=tmp.split(' ')
