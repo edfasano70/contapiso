@@ -4,9 +4,9 @@
 
 nombre?
 
-implementación de pipenv
+implementación de pipenv <- en curso
 
-test de creación de exec
+test de creación de exec <- en curso
 
 pasar todos los nombres a ingles o español <-DECIDETE!!!
 
