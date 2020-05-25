@@ -21,44 +21,6 @@ def clear():
 	else:
 		os.system("clear")
 
-def consoleInput(msg,type='str'):
-	# 	Función:
-	# 		Solicita un dato por consola
-	# 	Entradas:
-	# 		type: str <- str, int, float, date <-pendiente de momento
-	# 		msg: str <- mensaje a desplegar
-	# 	Salidas:
-	# 		value: resultado 
-	cs=Style.BRIGHT+Fore.GREEN
-	icon='[ ? ]'
-	print(cs+icon+Style.RESET_ALL+' : '+msg+' ',end='')
-	value=input()
-	return value
-
-def consoleMsgBox(type,msg,enter=False):
-	# 	Función:
-	# 		Imprime mensaje tipo "alertBox" por consola
-	# 	Entradas:
-	# 		type: str <- ok,error,alert
-	# 		msg: str <- mensaje a desplegar
-	# 		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
-	# 	Salidas:
-	# 		No 
-	cs=Style.BRIGHT
-	if type=='ok':
-		cs+=Fore.GREEN
-		icon='[ → ]'
-	elif type=='error':
-		cs+=Fore.RED
-		icon='[ X ]'
-	elif type=='alert':
-		cs+=Fore.YELLOW
-		icon='[ ! ]'
-	else:
-		cs=''
-	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')
-	if enter:
-		input()
 
 def isNumber(value):
 	# 	Función: 
@@ -593,7 +555,7 @@ def validateInput(value,params={'type':'str'}):
 				tmp2+=value[i]
 
 		value=tmp2
-		if tmp3!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp3))
+		if tmp3!='': console_msgbox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp3))
 
 		#verificamos capitalización
 		if params.get('capitalize',None)=='upper':
@@ -609,11 +571,11 @@ def validateInput(value,params={'type':'str'}):
 		if lenght_min!=None:
 			if len(value)<lenght_min: #,0):
 				res=False
-				consoleMsgBox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
+				console_msgbox('error','Debe tener al menos {} caracteres'.format(params.get('lenght_min',0)))
 		if lenght_max!=None:
 			if len(value)>lenght_max: #,100):
 				value=value[0:lenght_max] #,100)]
-				consoleMsgBox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
+				console_msgbox('alert','Supera la longitud máxima de {} caracateres'.format(params.get('lenght_max',20)))
 
 	elif type=='int':
 		value=str(value)
@@ -624,7 +586,7 @@ def validateInput(value,params={'type':'str'}):
 			if value[i] not in allowed_chars:
 				res=False
 				tmp+=value[i]
-		if tmp!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
+		if tmp!='': console_msgbox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
 
 		if res:
 			value=int(value)
@@ -634,11 +596,11 @@ def validateInput(value,params={'type':'str'}):
 			if value_min!=None:
 				if value<value_min: #,0):
 					res=False
-					consoleMsgBox('error','Por debajo del valor mínimo [{}]'.format(value_min))
+					console_msgbox('error','Por debajo del valor mínimo [{}]'.format(value_min))
 			if value_max!=None:
 				if value>value_max: #,100):
 					res=False
-					consoleMsgBox('error','Supera el valor máximo [{}]'.format(value_max))
+					console_msgbox('error','Supera el valor máximo [{}]'.format(value_max))
 			
 	elif type=='float':
 		value=str(value)
@@ -649,12 +611,12 @@ def validateInput(value,params={'type':'str'}):
 			if value[i] not in allowed_chars:
 				res=False
 				tmp+=value[i]
-		if tmp!='': consoleMsgBox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
+		if tmp!='': console_msgbox('error','Existen caracteres NO PERMITIDOS> "{}"'.format(tmp))
 
 		#verificamos que exista 1 '.' como máximo
 		if value.count('.')>1:
 			res=False
-			consoleMsgBox('error','Formato numérico ERRONEO'.format(tmp3))			
+			console_msgbox('error','Formato numérico ERRONEO'.format(tmp3))			
 		if res:
 			value=float(value)
 			#verificamos valor minimo y maximo
@@ -663,11 +625,11 @@ def validateInput(value,params={'type':'str'}):
 			if value_min!=None:
 				if value<value_min: #,0):
 					res=False
-					consoleMsgBox('error','Por debajo del valor mínimo [{}]'.format(value_min))
+					console_msgbox('error','Por debajo del valor mínimo [{}]'.format(value_min))
 			if value_max!=None:
 				if value>value_max: #,100):
 					res=False
-					consoleMsgBox('error','Supera el valor máximo [{}]'.format(value_max))
+					console_msgbox('error','Supera el valor máximo [{}]'.format(value_max))
 				
 	elif type=='date':
 		pass
