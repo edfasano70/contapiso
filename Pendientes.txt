@@ -2,14 +2,20 @@
 * Pendientes: *
 ***************
 
+BONUS programa de automatización de commits de git
+
 nombre?
 
 implementación de pipenv <- en curso
 
 test de creación de exec <- en curso
 
-pasar todos los nombres a ingles o español <-DECIDETE!!!
+pasar todos los nombres a ingles o español <-en proceso
 
+PIP-8 <- en proceso
+
+resolver problema de eval() en menu
+ 
 eliminar los errores de despliegue en la terminal de windows
 
 cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
