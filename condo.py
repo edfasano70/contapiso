@@ -13,6 +13,51 @@ import cfonts
 from cfonts import render, say
 colorama.init(autoreset=True)
 
+#CONSOLE WIDGETS
+
+def console_input(msg,type='str'):
+	# 	Función:
+	# 		Solicita un dato por consola
+	# 	Entradas:
+	# 		type: str <- str, int, float, date <-pendiente de momento
+	# 		msg: str <- mensaje a desplegar
+	# 	Salidas:
+	# 		value: resultado 
+	cs=Style.BRIGHT+Fore.GREEN
+	icon='[ ? ]'
+	print(cs+icon+Style.RESET_ALL+' : '+msg+' ',end='')
+	value=input()
+	return value
+
+def console_msgbox(type,msg,enter=False):
+	# 	Función:
+	# 		Imprime mensaje tipo "alertBox" por consola
+	# 	Entradas:
+	# 		type: str <- ok,error,alert
+	# 		msg: str <- mensaje a desplegar
+	# 		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
+	# 	Salidas:
+	# 		No 
+	cs=Style.BRIGHT
+	if type=='ok':
+		cs+=Fore.GREEN
+		icon='[ → ]'
+	elif type=='error':
+		cs+=Fore.RED
+		icon='[ X ]'
+	elif type=='alert':
+		cs+=Fore.YELLOW
+		icon='[ ! ]'
+	else:
+		cs=''
+	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')
+	if enter:
+		input()
+
+#END OF CONSOLE WIDGETS
+
+#CONSOLE FUNCTIONS
+
 def clear():
 	# Función:
 	# 	Borra la consola
@@ -21,8 +66,18 @@ def clear():
 	else:
 		os.system("clear")
 
+def terminal_size():
+    import fcntl, termios, struct
+    th, tw, hp, wp = struct.unpack('HHHH',
+        fcntl.ioctl(0, termios.TIOCGWINSZ,
+        struct.pack('HHHH', 0, 0, 0, 0)))
+    return tw, th
 
-def isNumber(value):
+#END OF CONSOLE FUNCTIONS
+
+#GENERAL PURPOSE FUNCTIONS
+
+def is_number(value):
 	# 	Función: 
 	# 		Devuelve True si s es del object tipo int o float
 	# 	Entrada:
@@ -48,6 +103,8 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
+#END OF GENERAL PURPOSE FUNCTIONS
 
 def generarReporte(database,inicio,cantidad,output='console',input_file='',output_file=''):#ojo
 	#output puede ser console, html, pdf
@@ -196,7 +253,7 @@ def renderTableAuto(database,params):
 			for i in range(0,len(row)):
 				if row[i]==None:
 					row[i]=''
-				if isNumber(row[i]): #si la columna es int o float lo convertimos a str formateado
+				if is_number(row[i]): #si la columna es int o float lo convertimos a str formateado
 					try:
 						tmp=params['columns'][keys[i]]['decimal_places']    #style['decimalplaces'][i]
 					except:
@@ -251,7 +308,9 @@ def renderTableAuto(database,params):
 
 	return(output)
 
-def getRow(database,table,id_name='id',id_value=None):
+#DATABASE FUNCTIONS
+
+def row_get(database,table,id_name='id',id_value=None):
 	# 	Función:
 	#		Obtiene una línea de datos de una base de datos SQLite
 	# 	Entrada:
@@ -265,9 +324,9 @@ def getRow(database,table,id_name='id',id_value=None):
 		sql='SELECT * FROM {} LIMIT 1'.format(table)
 	else:
 		sql='SELECT * FROM {} WHERE {} = {} LIMIT 1'.format(table,id_name,id_value)
-	return getRowSql(database,sql)
+	return row_query_get(database,sql)
 
-def getRowSql(database,sql):
+def row_query_get(database,sql):
 	# 	Función:
 	# 		Obtiene una línea de datos de una base de datos SQLite mediante un query
 	# 	Entrada:
@@ -284,9 +343,9 @@ def getRowSql(database,sql):
 	con.close()
 	return row
 
-	#getRowSql() pasaría a ser getQuery()[0]
+	#row_query_get() pasaría a ser getQuery()[0]
 
-def getQuery(database,sql):
+def query_get(database,sql):
 	# 	Función:
 	# 		Obtiene una tabla de resultados de una base de datos SQLite mediante un query
 	# 	Entrada:
@@ -306,26 +365,21 @@ def getQuery(database,sql):
 		data.append(row)
 	return data
 
-def tableList(database): #se puede hacer con getQuery()
+def database_table_list(database):
 	# 	Función:
 	# 		Obtiene lista de tablas en una base de datos SQLite
 	# 	Entrada:
 	# 		database: string <- nombre de la base de datos
 	# 	Regresa:
 	# 		tuple: valores retornados
-	con = lite.connect(database)
-	cur = con.cursor()
-	cur.execute("select name from sqlite_master where type='table' and name!='sqlite_sequence'")
+	sql="SELECT name FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence'"
+	query=query_get(database,sql)
 	res=[]
-	while True:
-		row = cur.fetchone()
-		if row == None:
-			break
-		res.append(row[0])
-	if con: con.close()
+	for q in query:
+		res.append(q['name'])
 	return res
 
-def insertRow(database,table,data):
+def row_insert(database,table,data):
 	# 	Función:
 	# 		Inserta una línea de datos de una base de datos SQLite
 	# 	Entrada:
@@ -356,7 +410,7 @@ def insertRow(database,table,data):
 	con.close()
 	return res
 
-def changeRowId(database,table,old_id,new_id):
+def row_change_id(database,table,old_id,new_id):
 	# 	Función:
 	# 		cambia el id  a una línea de datos de una base de datos SQLite
 	# 	Entrada:
@@ -372,14 +426,13 @@ def changeRowId(database,table,old_id,new_id):
 		cur = con.cursor()
 		sql="UPDATE {} SET id={} WHERE id={}".format(table,new_id,old_id)
 		try:
-			#print(sql)
 			cur.execute(sql)
 		except:
 		 	res = False
 	if con: con.close()
 	return res
 
-def updateRow(database,table,data): 
+def row_update(database,table,data): 
 	# 	Función: 
 	# 		cambia los datos de una fila en una tabla
 	# 	Entrada:
@@ -406,7 +459,7 @@ def updateRow(database,table,data):
 	if con: con.close()
 	return res
 
-def deleteRow(database,table,id_name,id_value):
+def row_delete(database,table,id_name,id_value):
 	# 	Función:
 	#		Borra una fila de datos de una tabla
 	# 	Entrada:
@@ -422,7 +475,7 @@ def deleteRow(database,table,id_name,id_value):
 	con.commit()
 	con.close()
 
-def maxId(database,table,id_name): 
+def table_max_id(database,table,id_name): 
 	# 	Descripción: Devuelve el máximo valor de la columna en una base de datos SQLite
 	# 		Notas: sólo funciona para valores enteros
 	# 	Entrada:
@@ -431,11 +484,11 @@ def maxId(database,table,id_name):
 	#		id_name  - string - nombre de la columna de apuntador normalmente 'id'
 	# 	Regresa:
 	#		int - valor máximo
-	res=getRowSql(database,'SELECT MAX({}) AS max FROM {}'.format(id_name,table)).get('max',0)
+	res=row_query_get(database,'SELECT MAX({}) AS max FROM {}'.format(id_name,table)).get('max',0)
 	if res==None: res=0
 	return res
 
-def recordExist(database,table,id_name,id_value): 
+def row_id_exist(database,table,id_name,id_value): 
 	# 	Descripción: Verifica que un registro exista en una base de datos SQLite
 	# 	Entrada:
 	#		database - string - nombre de la base de datos
@@ -445,12 +498,12 @@ def recordExist(database,table,id_name,id_value):
 	# 	Regresa:
 	#		bool - True si existe
 	res=False
-	count=getRowSql(database,'SELECT COUNT(id) AS count FROM {} WHERE {} = {}'.format(table,id_name,id_value)).get('count')
+	count=row_query_get(database,'SELECT COUNT(id) AS count FROM {} WHERE {} = {}'.format(table,id_name,id_value)).get('count')
 	if count>0:
 		res=True
 	return res
 
-def defragmentTable(database,table):
+def table_defrag(database,table):
 	# 	Función: 
 	#		'Defragmenta' la tabla poniendo todos los id consecutivos
 	# 	Entrada:
@@ -465,13 +518,10 @@ def defragmentTable(database,table):
 	i=1
 	for r in rows:
 		if r[0]!=i:
-			changeRowId(database,table,r[0],i)
+			row_change_id(database,table,r[0],i)
 		i+=1
 
-def insertEmptyRow(database,table,id):
-	pass
-
-def exportCsv(database,table,filename='out.csv'): #EXPERIMENTAL!!!
+def table_export_csv(database,table,filename='out.csv'): #EXPERIMENTAL!!!
 	# Función: 
 	#	Exporta una tabla especificada a  un archivo delimitado por comas CSV
 	# Entrada:
@@ -504,7 +554,7 @@ def exportCsv(database,table,filename='out.csv'): #EXPERIMENTAL!!!
 		fic.write(tmp)
 	fic.close()
 
-def importCsv(database,table,filename): #EXPERIMENTAL!!!
+def table_import_csv(database,table,filename): #EXPERIMENTAL!!!
 	# 	Función: 
 	#		importa un archivo delimitado por comas CSV a la base de datos y tabla especificada
 	# 	Entrada:
@@ -531,10 +581,12 @@ def importCsv(database,table,filename): #EXPERIMENTAL!!!
 			data={}
 			for i in range(0,len(keys)):
 				data[keys[i]]=values[i]
-			if recordExist(database,table,data['id']):
-				data['id']=str(maxId(database,table)+1)
+			if row_id_exist(database,table,data['id']):
+				data['id']=str(table_max_id(database,table)+1)
 			print(data)
-			insertRow(database,table,data)
+			row_insert(database,table,data)
+
+#END OF DATABASE FUNCTIONS
 
 def validateInput(value,params={'type':'str'}):
 	res=True

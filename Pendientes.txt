@@ -28,7 +28,7 @@ terminar con la implementacion de csv
 introducir validacion de fecha
 determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
-arreglar todas las descripciones de funciones <-en proceso
+arreglar todas las descripciones de funciones <-en curso
 
 separar las funciones en modulos
 
@@ -51,5 +51,7 @@ al crear nuevo periodo generar estructura de directorios
 > terminar de arreglar archivo json <-en curso
 > crear función consoleInput()
 > implementación de __name__
+> saber el ancho de la consola e implementarlo al mostrar la tabla
+
 
 

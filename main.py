@@ -13,45 +13,6 @@ period 		=	'012020'
 
 #CONSOLE WIDGETS
 
-def console_input(msg,type='str'):
-	# 	Función:
-	# 		Solicita un dato por consola
-	# 	Entradas:
-	# 		type: str <- str, int, float, date <-pendiente de momento
-	# 		msg: str <- mensaje a desplegar
-	# 	Salidas:
-	# 		value: resultado 
-	cs=Style.BRIGHT+Fore.GREEN
-	icon='[ ? ]'
-	print(cs+icon+Style.RESET_ALL+' : '+msg+' ',end='')
-	value=input()
-	return value
-
-def console_msgbox(type,msg,enter=False):
-	# 	Función:
-	# 		Imprime mensaje tipo "alertBox" por consola
-	# 	Entradas:
-	# 		type: str <- ok,error,alert
-	# 		msg: str <- mensaje a desplegar
-	# 		enter: bool <- indica si requiere pulsar ENTER para continuar. Default False
-	# 	Salidas:
-	# 		No 
-	cs=Style.BRIGHT
-	if type=='ok':
-		cs+=Fore.GREEN
-		icon='[ → ]'
-	elif type=='error':
-		cs+=Fore.RED
-		icon='[ X ]'
-	elif type=='alert':
-		cs+=Fore.YELLOW
-		icon='[ ! ]'
-	else:
-		cs=''
-	print(cs+icon+Style.RESET_ALL+' : '+msg+' ')
-	if enter:
-		input()
-
 def console_menu(title,options,exit_caption='Salir',null_exit=False):
 	#	Función:
 	# 		Crea un menú por consola de selección simple
@@ -100,11 +61,11 @@ def table_selector():
 	#	Función:
 	#		Explora la base de datos, crea menú de selección, devuelve el nombre de la tabla
 	#		o Null si la opción entrada no es válida
-	global DATABASE,views
+	global DATABASE,table_parameters
 	flag=False
 	title='Tablas Disponibles'
 	tables=[]
-	for t in tableList(DATABASE):
+	for t in database_table_list(DATABASE):
 		if 'gastos' not in t:
 			tables.append(t)
 		else:
@@ -114,7 +75,7 @@ def table_selector():
 
 	menu_tables=[]
 	for t in tables:
-		menu_tables.append([views[t]['caption'],t])
+		menu_tables.append([table_parameters[t]['caption'],t])
 
 	i=0
 	print('\n'+title)
@@ -159,12 +120,12 @@ def assign_value_2_dictkey(dict_name,dict_key,value=None):
 
 #APPLICATION SPECIFIC FUNCTIONS
 
-def crearTablaPeriodo():
+def new_period():
 	#	Función:
 	#		Crea una copia de la tabla gastos con el nombre gastos_MMYYYY donde MMYYYY es el
 	#		período 
 	global DATABASE,period
-	if 'gastos_'+period not in tableList(DATABASE):
+	if 'gastos_'+period not in database_table_list(DATABASE):
 
 		create_gastos_sql="CREATE TABLE gastos{} ( \
 		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
@@ -183,7 +144,7 @@ def crearTablaPeriodo():
 		pass
 	console_msgbox('ok','Cambio a período {}/{}'.format(period[0:2],period[2:]))
 
-def newModificarRegistro(id_name,id_value):
+def modify_table_row(id_name,id_value):
 	# 	Función:
 	# 		Modifica un registro preguntando valores
 	# 	Entrada:
@@ -193,13 +154,13 @@ def newModificarRegistro(id_name,id_value):
 	# 		id_value: str <- valor a modificar
 	# 	Regresa:
 	# 		DEBERIA regresar bool - True si se modificó
-	global DATABASE,table,views
+	global DATABASE,table,table_parameters
 	res=True
-	if recordExist(DATABASE,table,id_name,id_value):
-		row=getRow(DATABASE,table,id_name,id_value)
+	if row_id_exist(DATABASE,table,id_name,id_value):
+		row=row_get(DATABASE,table,id_name,id_value)
 		data={}
 		for c in row.keys():
-			cStyle=views[table]['columns'][c]
+			cStyle=table_parameters[table]['columns'][c]
 			while True:
 				caption=cStyle.get('caption')
 				helper=cStyle.get('helper')
@@ -218,32 +179,37 @@ def newModificarRegistro(id_name,id_value):
 				if res:
 					data[c]=tmp 
 					break
-		updateRow(DATABASE,table,data)
+		row_update(DATABASE,table,data)
 		console_msgbox('ok','Registro actualizado')
 	else:
 		console_msgbox('error','El registro id={} NO EXISTE'.format(id_value))
 		res=False
 	return res
 
-def manejoTablas():
+def table_crud_management():
 	#	Función:
 	#		Implementa las funciones CRUD sobre la tabla 'table' en 'DATABASE'
-	global DATABASE,table,period,views
+	global DATABASE,table,period,table_parameters
+
+	terminal_width,terminal_heigth=terminal_size()
+
 	while True:
 		clear()
-		header=views[table].get('header','')
+		header=table_parameters[table].get('header','')
 		header+='<{} in {}>'.format(table,DATABASE)
 		print(header+'\n')
 
 		firstRow=True
-		for rl in renderTableAuto(DATABASE,views[table]):
+		for rl in renderTableAuto(DATABASE,table_parameters[table]):
+			if len(rl)>terminal_width:
+				rl=rl[0:terminal_width]
 			if firstRow: 
 				print(Style.BRIGHT+rl+Style.RESET_ALL)
 				firstRow=False
 			else:
 				print(rl+Style.RESET_ALL)
 
-		print('\n'+views[table].get('footer','FdlT\n'))
+		print('\n'+table_parameters[table].get('footer','FdlT\n'))
 
 		print('» {0}N{1}uevo {0}M{1}odificar {0}B{1}orrar » '.format(Fore.YELLOW+Style.BRIGHT,Style.RESET_ALL),end='')
 		tmp=input().upper()
@@ -259,29 +225,31 @@ def manejoTablas():
 			break
 
 		elif opcion=='N':
-			data={'id':str(maxId(DATABASE,table,'id')+1)}
-			if insertRow(DATABASE,table,data):
+			data={'id':str(table_max_id(DATABASE,table,'id')+1)}
+			if row_insert(DATABASE,table,data):
 				console_msgbox('ok','Nuevo registro ingresado',False)
-				# newModificarRegistro('id',data['id'],views[table])
-				newModificarRegistro('id',data['id'])
+				# modify_table_row('id',data['id'],table_parameters[table])
+				modify_table_row('id',data['id'])
 			else:
 				console_msgbox('error','No se pudo ingresar el registro')
 
 		elif opcion=='M':
 			if opPar==0:
-				id=int(input('[?] Ingrese ID del registro a MODIFICAR > '))
+				id=int(console_input('Ingrese ID del registro a MODIFICAR'))
+				# id=int(input('[?]  > '))
 			else:
 				id=opPar
-			newModificarRegistro('id',id)
+			modify_table_row('id',id)
 
 		elif opcion=='B':
 			if opPar==0:
-				id=int(input('[?] Ingrese ID del registro a BORRAR > '))
+				id=int(console_input('Ingrese ID del registro a BORRAR'))
+				# id=int(input('[?] Ingrese ID del registro a BORRAR > '))
 			else:
 				id=opPar
-			if recordExist(DATABASE,table,'id',id):
-				deleteRow(DATABASE,table,'id',id)
-				defragmentTable(DATABASE,table)
+			if row_id_exist(DATABASE,table,'id',id):
+				row_delete(DATABASE,table,'id',id)
+				table_defrag(DATABASE,table)
 				console_msgbox('ok','Operación exitosa. Registro id={} BORRADO'.format(id),False)
 			else:
 				console_msgbox('error','Registro id={} no existe'.format(id),False)
@@ -291,14 +259,14 @@ def manejoTablas():
 		input('Pulse ENTER para continuar...')
 	clear()
 
-def validateViews():
+def validate_table_parameters():
 	#	Función:
-	#		Valida el dict 'views' que contiene toda la información de despliegue de las tablas
+	#		Valida el dict 'table_parameters' que contiene toda la información de despliegue de las tablas
 	#		Ingresa valores por defecto
 	#	Pendiente:
-	#		Que regrese un bool que sea True si se modificó 'views'
-	global DATABASE,views
-	tmp=(tableList(DATABASE))
+	#		Que regrese un bool que sea True si se modificó 'table_parameters'
+	global DATABASE,table_parameters
+	tmp=(database_table_list(DATABASE))
 
 	if 'gastos' not in tmp:
 		create_gastos_sql="CREATE TABLE gastos ( \
@@ -314,7 +282,7 @@ def validateViews():
 		cur.execute(create_gastos_sql)
 		con.close()
 
-		insertRow(database,'gastos',{'id':1})
+		row_insert(database,'gastos',{'id':1})
 
 		tmp.append('gastos')
 
@@ -325,8 +293,8 @@ def validateViews():
 	tmp=tmp2 
 
 	for t in tmp:
-		assign_value_2_dictkey(views,t,{})
-		vt=views[t]
+		assign_value_2_dictkey(table_parameters,t,{})
+		vt=table_parameters[t]
 		assign_value_2_dictkey(vt,'table',t)
 		assign_value_2_dictkey(vt,'caption',t)
 		assign_value_2_dictkey(vt,'sql','SELECT * FROM {}'.format(t))
@@ -335,9 +303,9 @@ def validateViews():
 		assign_value_2_dictkey(vt,'columns',{})
 
 		columns=[]
-		for c in getRow(DATABASE,vt.get('table'),'id',1).keys():
+		for c in row_get(DATABASE,vt.get('table'),'id',1).keys():
 			columns.append(c)
-		for c in getRowSql(DATABASE,vt.get('sql')).keys():
+		for c in row_query_get(DATABASE,vt.get('sql')).keys():
 			if c not in columns:
 				columns.append(c)
 
@@ -372,61 +340,62 @@ def validateViews():
 
 #OPTIONS SUBROUTINES
 
-def opcion_tablas():
+def option_tables():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Llama a tableSelector()
-	# 		Llama a manejoTablas() si la opción es válida
+	# 		Llama a table_crud_management() si la opción es válida
 	#		Si la tabla es gastos cambia los parámetros a la tabla de gastos del período
-	global DATABASE,table,views,period
+	global DATABASE,table,table_parameters,period
 	sel=table_selector()
 	if sel!=None:
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
-			views[table]=views['gastos'].copy()
-			views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
-			views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
-			views[table]['table']=table
-		manejoTablas()
+			table_parameters[table]=table_parameters['gastos'].copy()
+			table_parameters[table]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+			table_parameters[table]['header']=table_parameters['gastos']['header'].format(period[0:2],period[2:])
+			table_parameters[table]['table']=table
+		table_crud_management()
 		if table[0:6]=='gastos':
-			views.pop(table)
+			table_parameters.pop(table)
 
-def opcionReportes():
+def option_report():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Llama a generarReporte()
-	global DATABASE,table,views,period
-	if input('Generar reporte? (S/N)').upper()=='S': generarReporte(database,int(input('Inicio?')),int(input('Cantidad?')))
+	global DATABASE,table,table_parameters,period
+	if input('Generar reporte? (S/N)').upper()=='S':
+		generarReporte(DATABASE,int(input('Inicio?')),int(input('Cantidad?')))
 
-def opcionPeriodo():
+def option_period():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Cambia el período
-	global DATABASE,table,views,period
+	global DATABASE,table,table_parameters,period
 	month=input('Mes [MM] ? ')[0:2]
 	year=input('Año [YYYY] ? ')[0:4]
 	period=month+year
-	crearTablaPeriodo()
+	new_period()
 	input()
 
-def opcionImportar():
+def option_import():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Importa datos de archivo externo
 	#	Pendiente:
 	#		que pida nombre de archivo
 	#		formato xlsx
-	global DATABASE,table,views,period
+	global DATABASE,table,table_parameters,period
 	filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
 	importCsv(database,table,filename)
 
-def opcionExportar():
+def option_export():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Exporta datos de una tabla a un archivo externo
 	#		usa tableSelector()
-	global DATABASE,table,views,period
+	global DATABASE,table,table_parameters,period
 	sel=tableSelector()
 	if sel==None:
 		console_msgbox('error','Valor NO ES VALIDO',True)
@@ -434,31 +403,32 @@ def opcionExportar():
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
-			views[table]=views['gastos'].copy()
-			views[table]['sql']=views['gastos']['sql'].replace('gastos','gastos_'+period)
-			views[table]['header']=views['gastos']['header'].format(period[0:2],period[2:])
-			views[table]['table']=table
+			table_parameters[table]=table_parameters['gastos'].copy()
+			table_parameters[table]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+			table_parameters[table]['header']=table_parameters['gastos']['header'].format(period[0:2],period[2:])
+			table_parameters[table]['table']=table
 		filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
 
 		if filename!='': exportCsv(database,table,filename+'.csv')
 
 		if table[0:6]=='gastos':
-			views.pop(table)
+			table_parameters.pop(table)
 
 #END OF OPTIONS SUBROUTINES
 
 def main():
-	global DATABASE,table,period,views
+	global DATABASE,table,period,table_parameters
+
 	try:
-		with open(DATABASE+'.json') as file: views = json.load(file)
+		with open(DATABASE+'.json') as file: table_parameters = json.load(file)
 	except:
 		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
 		# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
-		views={}
+		table_parameters={}
 
-	#viewOld=views.copy()
+	#viewOld=table_parameters.copy()
 
-	validateViews()
+	validate_table_parameters()
 
 	while True:
 		clear()
@@ -472,14 +442,14 @@ def main():
 		print('='*len(dummy))
 
 		menu1=[]
-		menu1.append(['Datos','opcion_tablas()'])
+		menu1.append(['Datos','option_tables()'])
 		menu1.append(['Tablas',"consoleMenu('Tablas',menu2)"])
-		menu1.append(['Período','opcionPeriodo()'])
-		menu1.append(['Reportes','opcionReportes()'])
+		menu1.append(['Período','option_period()'])
+		menu1.append(['Reportes','option_report()'])
 
 		menu2=[]
-		menu2.append(['Importar','opcionImportar()'])
-		menu2.append(['Exportar','opcionExportar'])
+		menu2.append(['Importar','option_import()'])
+		menu2.append(['Exportar','option_export'])
 		
 		if console_menu('Opciones',menu1): break
 
@@ -488,16 +458,16 @@ def main():
 	if console_input('Guardar cambios en Configuración? (s/n)').upper()=='S':
 		console_msgbox('alert','GUARDANDO cambios en el archivo Json')
 		fic = open(DATABASE+'.json', "w")
-		fic.write(json.dumps(views,indent=4))
+		fic.write(json.dumps(table_parameters,indent=4))
 		fic.close()
 
 
-	# if views==viewOld:
+	# if table_parameters==viewOld:
 	# 	console_msgbox('ok','SIN cambios en archivo Json')
 	# else:
 	# 	console_msgbox('alert','GUARDANDO cambios en el archivo Json')
 	# 	fic = open(iniFile, "w")
-	# 	fic.write(json.dumps(views,indent=4))
+	# 	fic.write(json.dumps(table_parameters,indent=4))
 	# 	fic.close()
 
 	console_msgbox('ok','Bye!\n')

@@ -2,7 +2,7 @@
     "libro": {
         "database": "condominio.db3",
         "table": "libro",
-        "caption": "LIBRO DIARIO",
+        "caption": "Libro Diario",
         "sql": "SELECT * FROM libro",
         "header": "EDIFICIO GALERIAS MIRANDA\nLIBRO DIARIO\n",
         "footer": "FdlT",
@@ -16,7 +16,7 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true,
+                "enabled": false,
                 "decimal_places": 0,
                 "min": null,
                 "max": null
@@ -80,7 +80,7 @@
                 "max": null
             },
             "haber": {
-                "type": "int",
+                "type": "float",
                 "caption": "HABER(Bs)",
                 "helper": "haber",
                 "capitalize": null,
@@ -98,7 +98,7 @@
     "locales": {
         "database": "condominio.db3",
         "table": "locales",
-        "caption": "LOCALES COMERCIALES",
+        "caption": "Locales Comerciales",
         "sql": "SELECT * FROM locales",
         "header": "EDIFICIO GALERIAS MIRANDA\nLOCALES COMERCIALES\n",
         "footer": "FdlT",
@@ -112,7 +112,7 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true,
+                "enabled": false,
                 "decimal_places": 0,
                 "min": null,
                 "max": null
@@ -238,7 +238,7 @@
     "gastos": {
         "database": "condominio.db3",
         "table": "gastos",
-        "caption": "GASTOS DEL PERIODO",
+        "caption": "Gastos del Período",
         "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
         "header": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
         "footer": "FdlT",
@@ -252,7 +252,7 @@
                 "lenght_max": null,
                 "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true,
+                "enabled": false,
                 "decimal_places": 0,
                 "min": null,
                 "max": null
