@@ -2,6 +2,17 @@
 * Pendientes: *
 ***************
 
+versión alpha cuando estén funcionales todas las rutinas
+
+
+BUGS!!!
+
+validate_database_param() cuando la tabla está vacía
+
+resolver problema de eval() en menu
+
+OTHER:
+
 BONUS programa de automatización de commits de git
 
 nombre?
@@ -13,8 +24,6 @@ test de creación de exec <- en curso
 pasar todos los nombres a ingles o español <-en proceso
 
 PIP-8 <- en proceso
-
-resolver problema de eval() en menu
  
 eliminar los errores de despliegue en la terminal de windows
 
@@ -22,21 +31,12 @@ cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
 
 incorporar CURSES
 
-terminar con la implementacion de csv
-	para otras versiones: trabajar con formato xlsx
+importar desde xls <- falta poner como una advertencia y una verificaci
 
 introducir validacion de fecha
 determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
 arreglar todas las descripciones de funciones <-en curso
-
-separar las funciones en modulos
-
-crear estructura de directorios
-	periodos
-		csv
-		xlsx
-		pdf
 
 al crear nuevo periodo generar estructura de directorios
 
@@ -52,6 +52,14 @@ al crear nuevo periodo generar estructura de directorios
 > crear función consoleInput()
 > implementación de __name__
 > saber el ancho de la consola e implementarlo al mostrar la tabla
+> terminar con la implementacion de csv <- cancelado se hizo con xls
+> separar las funciones en modulos
+> crear estructura de directorios
+	periodos
+		csv
+		xlsx
+		pdf
+
 
 
 

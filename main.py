@@ -6,7 +6,7 @@ from condo import *
 
 INIFILE 	=	__name__.replace('_','')+'.json'
 DATABASE 	=	'database/condominio.db3'
-VERSION 	=	'0.1 alpha'
+VERSION 	=	'0.1.5 alpha'
 
 table 		=	'locales'
 period 		=	'012020'
@@ -303,7 +303,9 @@ def validate_table_parameters():
 		assign_value_2_dictkey(vt,'columns',{})
 
 		columns=[]
-		for c in row_get(DATABASE,vt.get('table'),'id',1).keys():
+		# print(vt.get('table'))
+		# for c in row_get(DATABASE,vt.get('table'),'id',1).keys():
+		for c in row_query_get(DATABASE,'SELECT * FROM {} LIMIT 1'.format(vt.get('table'))).keys():
 			columns.append(c)
 		for c in row_query_get(DATABASE,vt.get('sql')).keys():
 			if c not in columns:
@@ -335,6 +337,35 @@ def validate_table_parameters():
 
 			assign_value_2_dictkey(vt_c2,'visible',True)
 			assign_value_2_dictkey(vt_c2,'enabled',True)
+
+def export_table_to_xls(): # <-falta descripcion
+	global DATABASE,table,period
+	import pandas as pd
+	query=query_get(DATABASE,'SELECT * FROM {}'.format(table))
+	first_row=True
+	data_dict={}
+	for q in query:
+		if first_row:
+			first_row=False
+			row_keys=q.keys()
+			for r in row_keys:
+				assign_value_2_dictkey(data_dict,r,[])
+		for r in row_keys:
+			data_dict[r].append(q[r])
+	data_frame=pd.DataFrame.from_dict(data_dict)
+	data_frame.to_excel('xls/{}.xlsx'.format(table), sheet_name=table, index=False)
+
+def import_xls_into_table(): # <- falta descripción
+	global DATABASE,table,period
+	import pandas as pd
+	data_frame=pd.read_excel('xls/{}.xlsx'.format(table), sheet_name=table)
+	print(data_frame)
+	data_dict=data_frame.to_dict('records')
+	for d in data_dict:
+		d.pop('id')
+		print(d)
+		row_insert(DATABASE,table,d)
+	table_defrag(DATABASE,table)
 
 #END OF APPLICATION SPECIFIC FUNCTIONS
 
@@ -383,12 +414,10 @@ def option_import():
 	#	*** SUBRUTINA ***
 	#	Función:
 	#		Importa datos de archivo externo
-	#	Pendiente:
-	#		que pida nombre de archivo
-	#		formato xlsx
 	global DATABASE,table,table_parameters,period
-	filename=input('[?] Ingrese NOMBRE del archivo a importar > ')
-	importCsv(database,table,filename)
+	sel=table_selector()
+	if sel!=None:
+		import_xls_into_table()
 
 def option_export():
 	#	*** SUBRUTINA ***
@@ -396,23 +425,25 @@ def option_export():
 	#		Exporta datos de una tabla a un archivo externo
 	#		usa tableSelector()
 	global DATABASE,table,table_parameters,period
-	sel=tableSelector()
-	if sel==None:
-		console_msgbox('error','Valor NO ES VALIDO',True)
-	else:
+	sel=table_selector()
+	if sel!=None:
+	# 	console_msgbox('error','Valor NO ES VALIDO',True)
+	# else:
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
-			table_parameters[table]=table_parameters['gastos'].copy()
-			table_parameters[table]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
-			table_parameters[table]['header']=table_parameters['gastos']['header'].format(period[0:2],period[2:])
-			table_parameters[table]['table']=table
-		filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
+			# table_parameters[table]=table_parameters['gastos'].copy()
+			# table_parameters[table]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+			# table_parameters[table]['header']=table_parameters['gastos']['header'].format(period[0:2],period[2:])
+			# table_parameters[table]['table']=table
+		
+		export_table_to_xls()
+		# filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
 
-		if filename!='': exportCsv(database,table,filename+'.csv')
+		# if filename!='': exportCsv(database,table,filename+'.csv')
 
-		if table[0:6]=='gastos':
-			table_parameters.pop(table)
+		# if table[0:6]=='gastos':
+		# 	table_parameters.pop(table)
 
 #END OF OPTIONS SUBROUTINES
 
@@ -443,7 +474,8 @@ def main():
 
 		menu1=[]
 		menu1.append(['Datos','option_tables()'])
-		menu1.append(['Tablas',"consoleMenu('Tablas',menu2)"])
+		# menu1.append(['Tablas',"console_menu('Tablas',menu2)"])
+		menu1.append(['Tablas',"console_menu('Tablas',[['Importar','option_import()'],['Exportar','option_export()']])"])
 		menu1.append(['Período','option_period()'])
 		menu1.append(['Reportes','option_report()'])
 
@@ -471,6 +503,17 @@ def main():
 	# 	fic.close()
 
 	console_msgbox('ok','Bye!\n')
+
+
+
+# table='gastos'
+# export_table_to_xls()
+# table='locales'
+# export_table_to_xls()
+# table='libro'
+# export_table_to_xls()
+# sys.exit()
+
 
 if __name__ == '__main__':
 	main()
