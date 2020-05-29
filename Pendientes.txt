@@ -1,48 +1,52 @@
-***************
-* Pendientes: *
-***************
+*************
+* Pendings: *
+*************
 
 versión alpha cuando estén funcionales todas las rutinas
 
-
 BUGS!!!
 
-validate_database_param() cuando la tabla está vacía
-
-resolver problema de eval() en menu
+	eliminar los errores de despliegue en la terminal de windows
 
 OTHER:
 
-BONUS programa de automatización de commits de git
+IMPROVEMENTS
 
-nombre?
+	nombre?
 
-implementación de pipenv <- en curso
+	implementación de pipenv <- en curso
 
-test de creación de exec <- en curso
+	test de creación de exec <- en curso
 
-pasar todos los nombres a ingles o español <-en proceso
+	PIP-8 <- en proceso
 
-PIP-8 <- en proceso
+	arreglar todas las descripciones de funciones <-en curso
+
+	pasar todos los nombres a ingles o español <-en proceso
  
-eliminar los errores de despliegue en la terminal de windows
 
-cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
+PENDINGS
 
-incorporar CURSES
+	option_drop_table() <- hay que crear confirmación con captcha
 
-importar desde xls <- falta poner como una advertencia y una verificaci
+	option_generate_receipts()
 
-introducir validacion de fecha
-determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
+	option_email_receipts()
 
-arreglar todas las descripciones de funciones <-en curso
+	cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
 
-al crear nuevo periodo generar estructura de directorios
+	incorporar CURSES
 
-***********
-* Hechas: *
-***********
+	importar desde xls <- falta poner como una advertencia y una verificaci
+
+	introducir validacion de fecha
+	determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
+
+	al crear nuevo periodo generar estructura de directorios
+
+*********
+* Done: *
+*********
 
 > determinar si DATABASE es global <-en proceso
 > cambiar menu selector de tablas por el nuevo menú <-verificar
@@ -59,6 +63,8 @@ al crear nuevo periodo generar estructura de directorios
 		csv
 		xlsx
 		pdf
+> resolver problema de eval() en menu
+> validate_database_param() cuando la tabla está vacía
 
 
 

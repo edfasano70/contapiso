@@ -15,6 +15,41 @@ colorama.init(autoreset=True)
 
 #CONSOLE WIDGETS
 
+def console_menu(title,options,exit_caption='Exit',exit_on_null=True):
+	#	Función:
+	# 		Crea un menú por consola de selección simple
+	# 	Entradas:
+	# 		title: str <- título del menú
+	# 		options: list <- contiene pares de opción y comando a ejecutar
+	# 		exitOption: str <- nombre que va a tener la opción de salida del menú
+	# 		nullExit: bool <- si es true se sale del menú solo pulsando ENTER
+	# 	Regresa:
+	# 		bool <- TRUE si se seleccionó una opción válida
+	res=False
+	i=0
+	print('\n'+title)
+	print('-'*len(title))
+	for p in options:
+		i+=1
+		print(i,'·',p[0])
+	print(0,'· '+exit_caption)
+	error=False
+	sel=input('\n» ')
+	if sel=='':
+		if exit_on_null:
+			sel=0
+		else:
+			sel=-1
+	try:
+		sel=int(sel)
+	except:
+		sel=-1
+	if sel>=0 and sel<=i:
+		pass
+	else:
+		sel=-1
+	return sel
+
 def console_input(msg,type='str'):
 	# 	Función:
 	# 		Solicita un dato por consola
@@ -74,6 +109,23 @@ def terminal_size():
     return tw, th
 
 #END OF CONSOLE FUNCTIONS
+
+#DICTIONARY FUNCTIONS
+
+def rm_dict_key(dict_name,dict_key):
+	#	Función:
+	#		Remueve una clave de un diccionario trabajando directamente sobre el mismo
+	if dict_name.get(dict_key,False):
+		dict_name.pop(dict_key)
+
+def assign_value_2_dictkey(dict_name,dict_key,value=None): 
+	#	Función:
+	#		Asigna el valor por defecto a una clave en un diccionario y si no existe la crea
+	if dict_name.get(dict_key,None)==None:
+		dict_name[dict_key]=value
+	# dict_name[dict_key]=value
+
+#END OF DICTIONARY FUNCTIONS
 
 #GENERAL PURPOSE FUNCTIONS
 
@@ -209,40 +261,48 @@ def renderTableAuto(database,params):
 	# 		Genera el código para imprimir una tabla
  	#	Entrada:
  	#		params: dict <-contiene todos los parámetros para generar la tabla
-	#			database: string <- nombre de la base de datos  <-no
 	#			table: string <- nombre de la tabla <- no
 	#			style: dict <- tiene todos los parámetros que dibujan la tabla
 	#	Regresa:
-	#		string <- con todo el codigo para mostrar la tabla
+	#		list : con todo el codigo para mostrar la tabla
  	#	Pendiente:
  	#		validar errores
  	#		opción html
-	#database=params.get('database')
-	table=params.get('table')
-	sql=params.get('sql','SELECT * FROM {}'.format(table))
-	con = lite.connect(database)
-	con.row_factory = dict_factory
-	cur = con.cursor()
-	cur.execute(sql)
-	rows=cur.fetchall()
-	cur.close()
+	table 	=	params.get('table')
+	sql 	=	params.get('sql','SELECT * FROM {}'.format(table))
+
+	# con = lite.connect(database)
+	# con.row_factory = dict_factory
+	# cur = con.cursor()
+	# cur.execute(sql)
+	# rows=cur.fetchall()
+	# cur.close()
+
+	rows=query_get(database,sql)
+
+	# print('resultado')
+	# print(rows)
 
 	#convertimos el resultado en una matriz
-	rows = list(rows)
+	# print('convertido')
+	#rows = list(rows)
+	# print(rows)
+	# input('enter')
+
 	if rows!=[]:
 
 		data = []
 		keys = []
-		tmp2=[]
+		tmp  = []
 
 		for k in rows[0].keys():
 			keys.append(k)
 			try:
-				tmp2.append(params['columns'][k]['caption'])
+				tmp.append(params['columns'][k]['caption'])
 			except:
-				tmp2.append(k)
+				tmp.append(k)
 
-		data.append(tmp2)
+		data.append(tmp)
 
 		for r in rows:
 			tmp	= []
@@ -339,7 +399,8 @@ def row_query_get(database,sql):
 	cur = con.cursor()
 	cur.execute(sql)
 	row = cur.fetchone()
-	row=dict(zip(row.keys(), row)) #
+	if row!=None:
+		row=dict(zip(row.keys(), row)) #
 	con.close()
 	return row
 

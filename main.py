@@ -11,50 +11,6 @@ VERSION 	=	'0.1.5 alpha'
 table 		=	'locales'
 period 		=	'012020'
 
-#CONSOLE WIDGETS
-
-def console_menu(title,options,exit_caption='Salir',null_exit=False):
-	#	Función:
-	# 		Crea un menú por consola de selección simple
-	# 	Entradas:
-	# 		title: str <- título del menú
-	# 		options: list <- contiene pares de opción y comando a ejecutar
-	# 		exitOption: str <- nombre que va a tener la opción de salida del menú
-	# 		nullExit: bool <- si es true se sale del menú solo pulsando ENTER
-	# 	Regresa:
-	# 		bool <- TRUE si se seleccionó una opción válida
-	res=False
-	while True:
-		i=0
-		print('\n'+title)
-		print('-'*len(title))
-		for p in options:
-			i+=1
-			print(i,'·',p[0])
-		print(0,'· '+exit_caption)
-		error=False
-		sel=input('\n» ')
-		if sel=='':
-			if null_exit:
-				sel=0
-			else:
-				sel=i+1
-		try:
-			sel=int(sel)
-		except:
-			sel=-1
-			error=True
-		if sel==0:
-			res=True
-		elif sel>i or error==True:
-			console_msgbox('error','Valor NO ES VALIDO',True)
-		else:
-			eval(options[sel-1][1])
-		break
-	return res
-
-#END OF CONSOLE WIDGETS
-
 #APPLICATION SPECIFIC WIDGETS
 
 def table_selector():
@@ -101,22 +57,6 @@ def table_selector():
 	return res
 
 #END OF APPLICATION SPECIFIC WIDGETS
-
-#DICTIONARY FUNCTIONS
-
-def rm_dict_key(dict_name,dict_key):
-	#	Función:
-	#		Remueve una clave de un diccionario trabajando directamente sobre el mismo
-	if dict_name.get(dict_key,False):
-		dict_name.pop(dict_key)
-
-def assign_value_2_dictkey(dict_name,dict_key,value=None): 
-	#	Función:
-	#		Asigna el valor por defecto a una clave en un diccionario y si no existe la crea
-	if dict_name.get(dict_key,None)==None:
-		dict_name[dict_key]=value
-
-#END OF DICTIONARY FUNCTIONS
 
 #APPLICATION SPECIFIC FUNCTIONS
 
@@ -268,7 +208,10 @@ def validate_table_parameters():
 	global DATABASE,table_parameters
 	tmp=(database_table_list(DATABASE))
 
+	console_msgbox('ok','Validando parámetros de Base de Datos')
+
 	if 'gastos' not in tmp:
+
 		create_gastos_sql="CREATE TABLE gastos ( \
 		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
 		    locales_codigo VARCHAR( 10 ),\
@@ -305,11 +248,16 @@ def validate_table_parameters():
 		columns=[]
 		# print(vt.get('table'))
 		# for c in row_get(DATABASE,vt.get('table'),'id',1).keys():
+
+		row_insert(DATABASE,vt.get('table'),{'id':0}) #evitamos encontrarnos con una tabla vacía
+
 		for c in row_query_get(DATABASE,'SELECT * FROM {} LIMIT 1'.format(vt.get('table'))).keys():
 			columns.append(c)
 		for c in row_query_get(DATABASE,vt.get('sql')).keys():
 			if c not in columns:
 				columns.append(c)
+
+		row_delete(DATABASE,vt.get('table'),'id',0) #cancela lo de arriba
 
 		vt_c=vt['columns']
 
@@ -450,6 +398,7 @@ def option_export():
 def main():
 	global DATABASE,table,period,table_parameters
 
+	console_msgbox('ok','Cargando archivo de parámetros de Base de Datos')
 	try:
 		with open(DATABASE+'.json') as file: table_parameters = json.load(file)
 	except:
@@ -473,18 +422,39 @@ def main():
 		print('='*len(dummy))
 
 		menu1=[]
-		menu1.append(['Datos','option_tables()'])
-		# menu1.append(['Tablas',"console_menu('Tablas',menu2)"])
-		menu1.append(['Tablas',"console_menu('Tablas',[['Importar','option_import()'],['Exportar','option_export()']])"])
-		menu1.append(['Período','option_period()'])
-		menu1.append(['Reportes','option_report()'])
+		menu1.append(['Manejo de Datos','option_tables()'])
+		menu1.append(['Mantenimiento de Tablas',''])
+		menu1.append(['Cambio de Período','option_period()'])
+		menu1.append(['Reportes y Correo Electrónico','option_report()'])
 
 		menu2=[]
-		menu2.append(['Importar','option_import()'])
-		menu2.append(['Exportar','option_export'])
-		
-		if console_menu('Opciones',menu1): break
+		menu2.append(['Importar datos desde hoja de Excel','option_import()'])
+		menu2.append(['Exportar datos a hoja de Excel','option_export()'])
+		menu2.append(['Vaciar Tabla',''])
 
+		menu3=[]
+		menu3.append(['Generar Recibos',''])
+		menu3.append(['Enviar Recibos por Email',''])
+		
+		option=console_menu('Opciones',menu1,exit_on_null=False)
+		if option==0: 
+			break
+		elif option==-1:
+			console_msgbox('error','Opción NO VALIDA',True)
+		elif option==2:
+			option_2=console_menu('Menú Tablas',menu2)
+			if option_2==0 or option_2==-1:
+				pass
+			else:
+				eval(menu2[option_2-1][1])
+		elif option==4:
+			option_3=console_menu('Menú Reportes y Correo Electrónico',menu3)
+			if option_3==0 or option_3==-1:
+				pass
+			else:
+				eval(menu3[option_3-1][1])
+		else:
+			eval(menu1[option-1][1])
 	clear()
 
 	if console_input('Guardar cambios en Configuración? (s/n)').upper()=='S':
@@ -505,13 +475,8 @@ def main():
 	console_msgbox('ok','Bye!\n')
 
 
-
-# table='gastos'
-# export_table_to_xls()
 # table='locales'
-# export_table_to_xls()
-# table='libro'
-# export_table_to_xls()
+# print(row_get(DATABASE,table,'id',5000))
 # sys.exit()
 
 
