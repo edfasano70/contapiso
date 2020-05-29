@@ -4,6 +4,8 @@
 
 from condo import *
 
+APP_NAME	=	'CaStoR'
+APP_ALIAS	=	'castor'
 INIFILE 	=	__name__.replace('_','')+'.json'
 DATABASE 	=	'database/condominio.db3'
 VERSION 	=	'0.1.5 alpha'
