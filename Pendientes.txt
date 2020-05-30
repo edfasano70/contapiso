@@ -12,7 +12,7 @@ OTHER:
 
 IMPROVEMENTS
 
-	nombre?
+	nombre? <- tentativo: Contapiso
 
 	implementación de pipenv <- en curso
 
@@ -26,8 +26,6 @@ IMPROVEMENTS
  
 
 PENDINGS
-
-	option_drop_table() <- hay que crear confirmación con captcha
 
 	option_generate_receipts()
 
@@ -65,6 +63,7 @@ PENDINGS
 		pdf
 > resolver problema de eval() en menu
 > validate_database_param() cuando la tabla está vacía
+> option_drop_table() <- hay que crear confirmación con captcha
 
 
 

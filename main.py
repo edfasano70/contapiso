@@ -377,23 +377,21 @@ def option_export():
 	global DATABASE,table,table_parameters,period
 	sel=table_selector()
 	if sel!=None:
-	# 	console_msgbox('error','Valor NO ES VALIDO',True)
-	# else:
 		table=sel
 		if table=='gastos':
 			table='gastos_'+period
-			# table_parameters[table]=table_parameters['gastos'].copy()
-			# table_parameters[table]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
-			# table_parameters[table]['header']=table_parameters['gastos']['header'].format(period[0:2],period[2:])
-			# table_parameters[table]['table']=table
-		
 		export_table_to_xls()
-		# filename=input('[?] NOMBRE del archivo a exportar (sin extensión) > ')
 
-		# if filename!='': exportCsv(database,table,filename+'.csv')
 
-		# if table[0:6]=='gastos':
-		# 	table_parameters.pop(table)
+def option_table_delete_all_records():
+	global DATABASE,table,table_parameters,period
+	sel=table_selector()
+	if sel!=None:
+		if console_captcha():
+			table=sel
+			if table=='gastos':
+				table='gastos_'+period
+			table_delete_all_rows(DATABASE,table)
 
 #END OF OPTIONS SUBROUTINES
 
@@ -405,7 +403,6 @@ def main():
 		with open(DATABASE+'.json') as file: table_parameters = json.load(file)
 	except:
 		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
-		# print('ADVERTENCIA: archivo descriptorio {} no existe. Se crea plantilla vacía...'.format(iniFile))
 		table_parameters={}
 
 	#viewOld=table_parameters.copy()
@@ -432,7 +429,7 @@ def main():
 		menu2=[]
 		menu2.append(['Importar datos desde hoja de Excel','option_import()'])
 		menu2.append(['Exportar datos a hoja de Excel','option_export()'])
-		menu2.append(['Vaciar Tabla',''])
+		menu2.append(['Vaciar Tabla','option_table_delete_all_records()'])
 
 		menu3=[]
 		menu3.append(['Generar Recibos',''])
@@ -476,9 +473,6 @@ def main():
 
 	console_msgbox('ok','Bye!\n')
 
-
-# table='locales'
-# print(row_get(DATABASE,table,'id',5000))
 # sys.exit()
 
 

@@ -64,6 +64,29 @@ def console_input(msg,type='str'):
 	value=input()
 	return value
 
+def console_captcha(msg='Write following characters',chars=6):
+	# 	Función:
+	# 		Solicita la resolución de un captcha por consola
+	# 	Entradas:
+	# 		msg: str <- mensaje a desplegar
+	# 	Salidas:
+	# 		value: True si es coreccto 
+	from random import randint
+
+	res=False
+	cs=Style.BRIGHT+Fore.GREEN
+	icon='[ ? ]'
+
+	chars='abcdefghijklmnopqrstuvwxyz0123456789'
+	challenge=''
+	for i in range(0,6):
+		challenge+=chars[randint(0,len(chars)-1)]
+
+	print(cs+icon+Style.RESET_ALL+' : '+msg+' [{}] '.format(challenge),end='')
+	value=input()
+	if value==challenge: res=True
+	return res
+
 def console_msgbox(type,msg,enter=False):
 	# 	Función:
 	# 		Imprime mensaje tipo "alertBox" por consola
@@ -426,6 +449,19 @@ def query_get(database,sql):
 		data.append(row)
 	return data
 
+def query_exec(database,sql):
+	# 	Función:
+	# 		Obtiene una tabla de resultados de una base de datos SQLite mediante un query
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		sql: string <- query que genera la búsqueda
+	# 	Regresa:
+	#		dict - valores retornados
+	con = lite.connect(database)
+	cur = con.cursor()
+	cur.execute(sql)
+	con.close()
+
 def database_table_list(database):
 	# 	Función:
 	# 		Obtiene lista de tablas en una base de datos SQLite
@@ -538,7 +574,6 @@ def row_delete(database,table,id_name,id_value):
 
 def table_max_id(database,table,id_name): 
 	# 	Descripción: Devuelve el máximo valor de la columna en una base de datos SQLite
-	# 		Notas: sólo funciona para valores enteros
 	# 	Entrada:
 	#		database - string - nombre de la base de datos
 	#		table    - string - nombre de la tabla
@@ -548,6 +583,25 @@ def table_max_id(database,table,id_name):
 	res=row_query_get(database,'SELECT MAX({}) AS max FROM {}'.format(id_name,table)).get('max',0)
 	if res==None: res=0
 	return res
+
+def table_drop(database,table):
+	# 	Descripción: Borra la tabla completa valores y estructura
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		table    - string - nombre de la tabla
+	query='DROP TABLE IF EXISTS {}'.format(table)
+	query_exec(database,query)
+
+def table_delete_all_rows(database,table):
+	# 	Descripción: Borra recursivamente todos las filas de una tabla
+	# 	Entrada:
+	#		database - string - nombre de la base de datos
+	#		table    - string - nombre de la tabla
+	sql='SELECT * FROM {}'.format(table)
+	rows=query_get(database,sql)
+	for r in rows:
+		print(r['id'])
+		row_delete(database,table,'id',r['id'])
 
 def row_id_exist(database,table,id_name,id_value): 
 	# 	Descripción: Verifica que un registro exista en una base de datos SQLite
