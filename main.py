@@ -4,11 +4,12 @@
 
 from condo import *
 
-APP_NAME	=	'CaStoR'
-APP_ALIAS	=	'castor'
+APP_NAME	=	'Sistema de Gestión Condominial'
+APP_ALIAS	=	'Contapiso'
+VERSION 	=	'0.2 alpha'
+
 INIFILE 	=	__name__.replace('_','')+'.json'
 DATABASE 	=	'database/condominio.db3'
-VERSION 	=	'0.1.5 alpha'
 
 table 		=	'locales'
 period 		=	'012020'
@@ -308,13 +309,15 @@ def export_table_to_xls(): # <-falta descripcion
 def import_xls_into_table(): # <- falta descripción
 	global DATABASE,table,period
 	import pandas as pd
-	data_frame=pd.read_excel('xls/{}.xlsx'.format(table), sheet_name=table)
-	print(data_frame)
+	data_frame=pd.read_excel('xls/{}.xlsx'.format(table))#, sheet_name=table)
+	data_frame=data_frame.fillna('')
 	data_dict=data_frame.to_dict('records')
 	for d in data_dict:
+		# print('\nrecord')
+		# print(d)
 		d.pop('id')
-		print(d)
 		row_insert(DATABASE,table,d)
+	# input()
 	table_defrag(DATABASE,table)
 
 #END OF APPLICATION SPECIFIC FUNCTIONS
@@ -365,9 +368,20 @@ def option_import():
 	#	Función:
 	#		Importa datos de archivo externo
 	global DATABASE,table,table_parameters,period
+
+	print(Style.BRIGHT+Fore.YELLOW+'\n# Importante!!!'+Style.RESET_ALL)
+	print(' El correcto funcionamiento de esta opción depende los sigientes factores:')
+	print('→ El archivo a importar debe estar en formato \'xls\' con extensión \'.xlsx\'')
+	print('→ El nombre del archivo debe ser el mismo que el nombre de la tabla en la base de datos')
+	print('→ Con la excepción de la tabla \'gastos\' que será importada en la tabla del período correspondiente')
 	sel=table_selector()
 	if sel!=None:
-		import_xls_into_table()
+		filename=''
+		table=sel
+		if table=='gastos':
+			table='gastos_'+period
+		if console_captcha():
+			import_xls_into_table()
 
 def option_export():
 	#	*** SUBRUTINA ***
@@ -381,7 +395,6 @@ def option_export():
 		if table=='gastos':
 			table='gastos_'+period
 		export_table_to_xls()
-
 
 def option_table_delete_all_records():
 	global DATABASE,table,table_parameters,period
@@ -405,25 +418,25 @@ def main():
 		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
 		table_parameters={}
 
-	#viewOld=table_parameters.copy()
+	table_parameters_initial=table_parameters.copy()
 
 	validate_table_parameters()
 
 	while True:
 		clear()
 		say(
-			'KaiKei',
+			APP_ALIAS,
 			font="slick",
 			align='left'
 		)
-		dummy='GESTION DE CONDOMINIO ver. {}'.format(VERSION)
+		dummy='{} ver. {}'.format(APP_NAME,VERSION)
 		print(dummy)
-		print('='*len(dummy))
+		print('-'*len(dummy))
 
 		menu1=[]
 		menu1.append(['Manejo de Datos','option_tables()'])
 		menu1.append(['Mantenimiento de Tablas',''])
-		menu1.append(['Cambio de Período','option_period()'])
+		menu1.append(['Cambio de Período. Actual → {}/{}'.format(period[0:2],period[2:]),'option_period()'])
 		menu1.append(['Reportes y Correo Electrónico','option_report()'])
 
 		menu2=[]
@@ -456,23 +469,29 @@ def main():
 			eval(menu1[option-1][1])
 	clear()
 
-	if console_input('Guardar cambios en Configuración? (s/n)').upper()=='S':
-		console_msgbox('alert','GUARDANDO cambios en el archivo Json')
-		fic = open(DATABASE+'.json', "w")
-		fic.write(json.dumps(table_parameters,indent=4))
-		fic.close()
-
-
-	# if table_parameters==viewOld:
-	# 	console_msgbox('ok','SIN cambios en archivo Json')
-	# else:
+	# if console_input('Guardar cambios en Configuración? (s/n)').upper()=='S':
 	# 	console_msgbox('alert','GUARDANDO cambios en el archivo Json')
-	# 	fic = open(iniFile, "w")
+	# 	fic = open(DATABASE+'.json', "w")
 	# 	fic.write(json.dumps(table_parameters,indent=4))
 	# 	fic.close()
 
+
+	if table_parameters==table_parameters_initial:
+		console_msgbox('ok','SIN cambios en archivo Json')
+	else:
+		console_msgbox('alert','GUARDANDO cambios en el archivo Json')
+		fic = open(iniFile, "w")
+		fic.write(json.dumps(table_parameters,indent=4))
+		fic.close()
+		console_msgbox('alert','GUARDANDO respaldo')
+		fic = open('bak/main_{}.json'.format(date_time_now()), "w")
+		fic.write(json.dumps(table_parameters_initial,indent=4))
+		fic.close()
+		
+
 	console_msgbox('ok','Bye!\n')
 
+# print(console_input('entra algo',default='esto es'))
 # sys.exit()
 
 

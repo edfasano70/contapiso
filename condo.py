@@ -15,7 +15,7 @@ colorama.init(autoreset=True)
 
 #CONSOLE WIDGETS
 
-def console_menu(title,options,exit_caption='Exit',exit_on_null=True):
+def console_menu(title,options,exit_caption='Exit',exit_on_null=True,orientation='vertical'):
 	#	Función:
 	# 		Crea un menú por consola de selección simple
 	# 	Entradas:
@@ -27,14 +27,23 @@ def console_menu(title,options,exit_caption='Exit',exit_on_null=True):
 	# 		bool <- TRUE si se seleccionó una opción válida
 	res=False
 	i=0
-	print('\n'+title)
-	print('-'*len(title))
-	for p in options:
-		i+=1
-		print(i,'·',p[0])
-	print(0,'· '+exit_caption)
 	error=False
-	sel=input('\n» ')
+	if orientation=='vertical':
+		print('\n'+title)
+		print('-'*len(title))
+		for p in options:
+			i+=1
+			print(i,'·',p[0])
+		print(0,'· '+exit_caption)
+		sel=input('\n» ')
+	elif orientation=='horizontal':
+		print('\n'+title,end='')
+		for p in options:
+			i+=1
+			print(i,'·',p[0],' ')
+		print(0,'· '+exit_caption,' ')
+		sel=input(' » ')
+
 	if sel=='':
 		if exit_on_null:
 			sel=0
@@ -50,7 +59,7 @@ def console_menu(title,options,exit_caption='Exit',exit_on_null=True):
 		sel=-1
 	return sel
 
-def console_input(msg,type='str'):
+def console_input(msg,type='str',default=''):
 	# 	Función:
 	# 		Solicita un dato por consola
 	# 	Entradas:
@@ -60,11 +69,13 @@ def console_input(msg,type='str'):
 	# 		value: resultado 
 	cs=Style.BRIGHT+Fore.GREEN
 	icon='[ ? ]'
+	if default!='': msg+=' [{}] '.format(default)
 	print(cs+icon+Style.RESET_ALL+' : '+msg+' ',end='')
 	value=input()
+	if value=='': value=default
 	return value
 
-def console_captcha(msg='Write following characters',chars=6):
+def console_captcha(msg='Write following characters',num_chars=4):
 	# 	Función:
 	# 		Solicita la resolución de un captcha por consola
 	# 	Entradas:
@@ -79,7 +90,7 @@ def console_captcha(msg='Write following characters',chars=6):
 
 	chars='abcdefghijklmnopqrstuvwxyz0123456789'
 	challenge=''
-	for i in range(0,6):
+	for i in range(0,num_chars):
 		challenge+=chars[randint(0,len(chars)-1)]
 
 	print(cs+icon+Style.RESET_ALL+' : '+msg+' [{}] '.format(challenge),end='')
@@ -151,6 +162,11 @@ def assign_value_2_dictkey(dict_name,dict_key,value=None):
 #END OF DICTIONARY FUNCTIONS
 
 #GENERAL PURPOSE FUNCTIONS
+
+def date_time_now():
+	from datetime import datetime
+	now=datetime.now()
+	return now.strftime('%Y-%m-%d %H:%M')
 
 def is_number(value):
 	# 	Función: 
@@ -600,7 +616,7 @@ def table_delete_all_rows(database,table):
 	sql='SELECT * FROM {}'.format(table)
 	rows=query_get(database,sql)
 	for r in rows:
-		print(r['id'])
+		# print(r['id'])
 		row_delete(database,table,'id',r['id'])
 
 def row_id_exist(database,table,id_name,id_value): 

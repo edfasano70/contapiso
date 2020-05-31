@@ -12,7 +12,7 @@ OTHER:
 
 IMPROVEMENTS
 
-	nombre? <- tentativo: Contapiso
+	console_menu() <- que tenga opción horizontal y shortcuts
 
 	implementación de pipenv <- en curso
 
@@ -23,6 +23,16 @@ IMPROVEMENTS
 	arreglar todas las descripciones de funciones <-en curso
 
 	pasar todos los nombres a ingles o español <-en proceso
+
+	que permita importar gastos desde otro período
+
+	en manejo de tablas opción a ver registro
+
+	en manejo de tablas opción a buscar registro
+
+	cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
+
+	incorporar CURSES
  
 
 PENDINGS
@@ -31,14 +41,7 @@ PENDINGS
 
 	option_email_receipts()
 
-	cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
-
-	incorporar CURSES
-
-	importar desde xls <- falta poner como una advertencia y una verificaci
-
 	introducir validacion de fecha
-	determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 
 	al crear nuevo periodo generar estructura de directorios
 
@@ -64,6 +67,11 @@ PENDINGS
 > resolver problema de eval() en menu
 > validate_database_param() cuando la tabla está vacía
 > option_drop_table() <- hay que crear confirmación con captcha
+> importar desde xls <- falta poner como una advertencia y una verificaci
+> nombre? <- tentativo: Contapiso
+> determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
+
+
 
 
 
