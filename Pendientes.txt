@@ -16,9 +16,13 @@ PENDINGS
 
 	option_email_receipts()
 
-	introducir validacion de fecha
-
 IMPROVEMENTS
+
+	barra de progreso
+
+	opción limpieza que borre los baks
+
+	introducir validacion de fecha
 
 	console_menu() <- que tenga opción horizontal y shortcuts
 
