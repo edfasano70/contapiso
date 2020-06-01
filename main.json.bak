@@ -1,0 +1,7 @@
+{
+    "database": "database/condominio.db3",
+    "table": "locales",
+    "period": "012020",
+    "sender_email": "some@gmail.com",
+    "sender_password": "123456"
+}

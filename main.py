@@ -6,7 +6,7 @@ from condo import *
 
 APP_NAME	=	'Sistema de Gestión Condominial'
 APP_ALIAS	=	'Contapiso'
-VERSION 	=	'0.2 alpha'
+VERSION 	=	'0.2.5 alpha'
 
 INIFILE 	=	__name__.replace('_','')+'.json'
 DATABASE 	=	'database/condominio.db3'
@@ -289,6 +289,24 @@ def validate_table_parameters():
 			assign_value_2_dictkey(vt_c2,'visible',True)
 			assign_value_2_dictkey(vt_c2,'enabled',True)
 
+def validate_app_parameters():
+	#	Función:
+	#		Valida el dict 'table_parameters' que contiene toda la información de despliegue de las tablas
+	#		Ingresa valores por defecto
+	#	Pendiente:
+	#		Que regrese un bool que sea True si se modificó 'table_parameters'
+	global DATABASE,table,period,app_parameters
+
+	console_msgbox('ok','Validando parámetros de Aplicación')
+	assign_value_2_dictkey(app_parameters,'database',DATABASE)
+	DATABASE=app_parameters['database']
+	assign_value_2_dictkey(app_parameters,'table',table)
+	table=app_parameters['table']
+	assign_value_2_dictkey(app_parameters,'period',period)
+	period=app_parameters['period']
+	assign_value_2_dictkey(app_parameters,'sender_email','some@gmail.com')
+	assign_value_2_dictkey(app_parameters,'sender_password','123456')
+
 def export_table_to_xls(): # <-falta descripcion
 	global DATABASE,table,period
 	import pandas as pd
@@ -320,6 +338,197 @@ def import_xls_into_table(): # <- falta descripción
 	# input()
 	table_defrag(DATABASE,table)
 
+def generate_invoice(data,output='console'):
+	#output puede ser console, html, pdf
+	global DATABASE,period,table_parameters
+
+	#obtenemos el total de gastos
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{}'.format(period))
+
+	subtotal 		=	res['subtotal']
+	reserva 		=	subtotal*10/100
+	total_gastos	=	subtotal+reserva
+	alicuota 		=	data['alicuota']
+	saldo 			= 	data['saldo']
+	interes_mora	=	saldo/100
+	monto_alicuota	=	total_gastos*alicuota/100
+
+	if output=='console' or output=='pdf':
+		res=[]
+
+		res.append('Factura #{}'.format(1))
+		res.append('Local       : {}'.format(data['local']))
+		res.append('Propietario : {}'.format(data['propietario']))
+		if data['propietario']!=data['inquilino']: res.append('Inquilino   : {}'.format(data['inquilino']))
+
+		table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
+		table_parameters['gastos_'+period]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+
+		report_lines=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
+		table_parameters.pop('gastos_'+period)
+
+		max_width=0
+		firstRow=True
+		for rl in report_lines:
+			res.append(rl)
+			if len(rl)>max_width: max_width=len(rl)
+
+		report_width_str='{:>'+str(max_width-1)+'}'
+
+		separator='-------------------------------------------'
+		res.append(report_width_str.format(separator))
+
+		res.append(report_width_str.format('SUBTOTAL (Bs): {:>15,.2f}'.format(subtotal)))
+		res.append(report_width_str.format('RESERVA (10%) (Bs): {:>15,.2f}'.format(reserva)))
+		res.append(report_width_str.format(separator))
+
+		res.append(report_width_str.format('TOTAL (Bs): {:>15,.2f}'.format(total_gastos)))
+		res.append(report_width_str.format(separator))
+
+		res.append(report_width_str.format('{:>25}{:>55}'.format('ALICUOTA (%): {:>7,.4f}'.format(alicuota),'MONTO x ALICUOTA (Bs): {:>15,.2f}'.format(monto_alicuota))))
+		tmp1='SALDO MES(ES) ANTERIOR(ES) (Bs): {:>15,.2f}'.format(saldo)
+		res.append(report_width_str.format(tmp1))
+		tmp1='INTERES DE MORA (1%) (Bs): {:>15,.2f}'.format(interes_mora)
+		res.append(report_width_str.format(tmp1))
+		total_a_pagar=monto_alicuota+saldo+interes_mora
+		res.append(report_width_str.format(separator))
+		tmp1='TOTAL A PAGAR (Bs): {:>15,.2f}'.format(total_a_pagar)
+		res.append(report_width_str.format(tmp1))
+
+	elif output=='html':
+		pass
+	else:
+		pass
+
+	if output=='console':
+		for r in res:
+			print(r)
+		print()
+		console_msgbox('ok','Fin de la Factura',enter=True)
+
+	elif output=='pdf':
+		filename=period+'_'+data['codigo']+'.pdf'
+		pdf = FPDF() 
+		pdf.add_page() 
+		pdf.set_font("Courier", size = 8) 
+		pdf.image('resources/logo.jpg',10,6,30)
+		for r in res: 
+			pdf.cell(0, 4, txt = r, ln = 1, align = 'C', border=0) 
+		pdf.output('pdf/'+filename)
+	elif output=='html':
+		pass
+	else:
+		pass
+
+def renderTableAuto(database,params):
+	#	Función:
+	# 		Genera el código para imprimir una tabla
+ 	#	Entrada:
+ 	#		params: dict <-contiene todos los parámetros para generar la tabla
+	#			table: string <- nombre de la tabla <- no
+	#			style: dict <- tiene todos los parámetros que dibujan la tabla
+	#	Regresa:
+	#		list : con todo el codigo para mostrar la tabla
+ 	#	Pendiente:
+ 	#		validar errores
+ 	#		opción html
+	table 	=	params.get('table')
+	sql 	=	params.get('sql','SELECT * FROM {}'.format(table))
+	rows=query_get(database,sql)
+	if rows!=[]:
+		data = []
+		keys = []
+		tmp  = []
+
+		for k in rows[0].keys():
+			keys.append(k)
+			try:
+				tmp.append(params['columns'][k]['caption'])
+			except:
+				tmp.append(k)
+
+		data.append(tmp)
+
+		for r in rows:
+			tmp	= []
+			for k in r.values():
+				tmp.append(k)
+			data.append(tmp)
+		for row in data:
+			for i in range(0,len(row)):
+				if row[i]==None:
+					row[i]=''
+				if is_number(row[i]): #si la columna es int o float lo convertimos a str formateado
+					try:
+						tmp=params['columns'][keys[i]]['decimal_places']    #style['decimalplaces'][i]
+					except:
+						tmp=2
+					#print(keys[i],tmp)
+					tmp='>{:,.'+str(tmp)+'f}'
+					row[i]=tmp.format(row[i])
+		#acá se obtiene el ancho máximo de las columnas
+		colWidth=[]
+		firstRow=True
+		for row in data:
+			if firstRow:
+				firstRow=False
+				for i in range(0,len(row)):
+					colWidth.append(len(row[i]))
+			else:
+				for i in range(0,len(row)):
+					if len(row[i])>colWidth[i]:
+						colWidth[i]=len(row[i])
+		#a continuación ponemos todas las celdas al máximo de ancho
+		firstRow=True
+		for row in data:
+			if firstRow:
+				firstRow=False
+				for i in range(0,len(row)):
+					tmp='{:^'+str(colWidth[i])+'}'
+					row[i]=tmp.format(row[i])
+			else:
+				for i in range(0,len(row)):
+					if row[i][0:1]!='>':
+						row[i]=row[i]+colWidth[i]*' '
+						row[i]=row[i][0:colWidth[i]]
+					else:
+						row[i]=colWidth[i]*' '+row[i][1:]
+						row[i]=row[i][colWidth[i]*(-1):]
+		max_width=0
+		t2=''
+		res=''
+		firstRow=True
+		output=[]
+		for row in data:
+			t2=''
+			res=''
+			res+=t2+' '
+			for r in row:
+				res += r+' '
+			output.append(res)
+			if len(res)>max_width: max_width=len(res)
+		output.insert(1,'-'*(max_width-1))
+	else:
+		output=['La tabla está vacía...\n']
+
+	return(output)
+
+def email_invoice(data):
+	sender_email 	= 	'alvafasa@gmail.com'
+	receiver_email 	= 	'edmundofasano@gmail.com'
+	subject 		= 	"Check THIS out"
+	sender_password	=	'Irama2017'
+
+	yag = yagmail.SMTP(user=sender_email, password=sender_password)
+
+	contents = [
+	  "This is the first paragraph in our email",
+	  "As you can see, we can send a list of strings,",
+	  "being this our third one",
+	  "mygfg.pdf"
+	]
+	yag.send(receiver_email, subject, contents)
+
 #END OF APPLICATION SPECIFIC FUNCTIONS
 
 #OPTIONS SUBROUTINES
@@ -343,14 +552,6 @@ def option_tables():
 		table_crud_management()
 		if table[0:6]=='gastos':
 			table_parameters.pop(table)
-
-def option_report():
-	#	*** SUBRUTINA ***
-	#	Función:
-	#		Llama a generarReporte()
-	global DATABASE,table,table_parameters,period
-	if input('Generar reporte? (S/N)').upper()=='S':
-		generarReporte(DATABASE,int(input('Inicio?')),int(input('Cantidad?')))
 
 def option_period():
 	#	*** SUBRUTINA ***
@@ -406,11 +607,38 @@ def option_table_delete_all_records():
 				table='gastos_'+period
 			table_delete_all_rows(DATABASE,table)
 
+def option_generate_invoices():
+	#	*** SUBRUTINA ***
+	#	Función:
+	#		Genera todas las facturas y las guarda en pdf en la carpeta /pdf
+	global DATABASE,table,table_parameters,period
+	res=query_get(DATABASE,'SELECT * FROM locales')
+	print('Procesando ',end='')
+	for r in res:
+		generate_invoice(r,output='pdf')
+		print('..',end='')
+
+def option_email_invoices():
+	console_msgbox('ok','Opción enviar facturas',enter=True)
+
 #END OF OPTIONS SUBROUTINES
 
 def main():
-	global DATABASE,table,period,table_parameters
+	global DATABASE,table,period,table_parameters,app_parameters,INIFILE
 
+	#Proceso de INIFILE 
+	console_msgbox('ok','Cargando archivo de parámetros de Aplicación')
+	try:
+		with open(INIFILE) as file: app_parameters = json.load(file)
+	except:
+		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(INIFILE),True)
+		app_parameters={}
+
+	app_parameters_initial=app_parameters.copy()
+
+	validate_app_parameters()
+
+	#Proceso de <database>.json
 	console_msgbox('ok','Cargando archivo de parámetros de Base de Datos')
 	try:
 		with open(DATABASE+'.json') as file: table_parameters = json.load(file)
@@ -429,15 +657,15 @@ def main():
 			font="slick",
 			align='left'
 		)
-		dummy='{} ver. {}'.format(APP_NAME,VERSION)
+		dummy='{}{} ver. {}{}'.format(Style.BRIGHT,APP_NAME,VERSION,Style.RESET_ALL)
 		print(dummy)
 		print('-'*len(dummy))
 
 		menu1=[]
 		menu1.append(['Manejo de Datos','option_tables()'])
 		menu1.append(['Mantenimiento de Tablas',''])
-		menu1.append(['Cambio de Período. Actual → {}/{}'.format(period[0:2],period[2:]),'option_period()'])
-		menu1.append(['Reportes y Correo Electrónico','option_report()'])
+		menu1.append(['Cambio de Período.{} Actual → {}/{}{}'.format(Style.BRIGHT,period[0:2],period[2:],Style.RESET_ALL),'option_period()'])
+		menu1.append(['Facturas (Generar y Enviar)',''])
 
 		menu2=[]
 		menu2.append(['Importar datos desde hoja de Excel','option_import()'])
@@ -445,8 +673,8 @@ def main():
 		menu2.append(['Vaciar Tabla','option_table_delete_all_records()'])
 
 		menu3=[]
-		menu3.append(['Generar Recibos',''])
-		menu3.append(['Enviar Recibos por Email',''])
+		menu3.append(['Generar Facturas','option_generate_invoices()'])
+		menu3.append(['Enviar Facturas por Email','option_email_invoices()'])
 		
 		option=console_menu('Opciones',menu1,exit_on_null=False)
 		if option==0: 
@@ -460,7 +688,13 @@ def main():
 			else:
 				eval(menu2[option_2-1][1])
 		elif option==4:
-			option_3=console_menu('Menú Reportes y Correo Electrónico',menu3)
+			option_4=console_menu('Menú Facturas',menu3)
+			if option_4==0 or option_4==-1:
+				pass
+			else:
+				eval(menu3[option_4-1][1])
+		elif option==4:
+			option_3=console_menu('Menú Facturas y Envío',menu3)
 			if option_3==0 or option_3==-1:
 				pass
 			else:
@@ -477,17 +711,33 @@ def main():
 
 
 	if table_parameters==table_parameters_initial:
-		console_msgbox('ok','SIN cambios en archivo Json')
+		pass
+		# console_msgbox('ok','SIN cambios en archivo <database>.Json')
 	else:
-		console_msgbox('alert','GUARDANDO cambios en el archivo Json')
-		fic = open(iniFile, "w")
+		console_msgbox('alert','GUARDANDO cambios en el archivo < [database] >.json')
+		fic = open(DATABASE+'.json', "w")
 		fic.write(json.dumps(table_parameters,indent=4))
 		fic.close()
 		console_msgbox('alert','GUARDANDO respaldo')
-		fic = open('bak/main_{}.json'.format(date_time_now()), "w")
+		fic = open('bal/'+DATABASE+'_{}.json'.format(date_time_now()), "w")
 		fic.write(json.dumps(table_parameters_initial,indent=4))
 		fic.close()
-		
+
+	app_parameters['table']=table
+	app_parameters['period']=period
+
+	if app_parameters==app_parameters_initial:
+		pass
+		# console_msgbox('ok','nada cambió')
+	else:
+		console_msgbox('alert','ACTUALIZANDO < main.json >')
+		fic = open(INIFILE, "w")
+		fic.write(json.dumps(app_parameters,indent=4))
+		fic.close()
+		console_msgbox('alert','GUARDANDO respaldo < main.json.bak >')
+		fic = open(INIFILE+'.bak', "w")
+		fic.write(json.dumps(app_parameters_initial,indent=4))
+		fic.close()		
 
 	console_msgbox('ok','Bye!\n')
 

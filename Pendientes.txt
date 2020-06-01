@@ -10,6 +10,14 @@ BUGS!!!
 
 OTHER:
 
+PENDINGS
+
+	option_generate_receipts() <-falta pulirla
+
+	option_email_receipts()
+
+	introducir validacion de fecha
+
 IMPROVEMENTS
 
 	console_menu() <- que tenga opción horizontal y shortcuts
@@ -33,17 +41,9 @@ IMPROVEMENTS
 	cambiar getRowSql() por getQuery() <- getRowSql() pasaría a ser getQuery()[0]
 
 	incorporar CURSES
- 
-
-PENDINGS
-
-	option_generate_receipts()
-
-	option_email_receipts()
-
-	introducir validacion de fecha
 
 	al crear nuevo periodo generar estructura de directorios
+
 
 *********
 * Done: *
@@ -70,6 +70,8 @@ PENDINGS
 > importar desde xls <- falta poner como una advertencia y una verificaci
 > nombre? <- tentativo: Contapiso
 > determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
+> archivo main.json
+
 
 
 
