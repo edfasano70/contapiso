@@ -14,6 +14,9 @@ DATABASE 	=	'database/condominio.db3'
 table 		=	'locales'
 period 		=	'012020'
 
+table_parameters={}
+table_parameters_initial={}
+
 #APPLICATION SPECIFIC WIDGETS
 
 def table_selector():
@@ -274,7 +277,7 @@ def validate_table_parameters():
 				assign_value_2_dictkey(vt_c2,'capitalize')
 				assign_value_2_dictkey(vt_c2,'lenght_min')
 				assign_value_2_dictkey(vt_c2,'lenght_max')
-				assign_value_2_dictkey(vt_c2,'allowedChars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+				assign_value_2_dictkey(vt_c2,'allowed_chars','ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
 
 			elif vt_c2['type']=='int':
 				assign_value_2_dictkey(vt_c2,'decimal_places',0)
@@ -640,7 +643,7 @@ def option_email_invoices():
 #END OF OPTIONS SUBROUTINES
 
 def main():
-	global DATABASE,table,period,table_parameters,app_parameters,INIFILE
+	global DATABASE,table,period,table_parameters,table_parameters_initial,app_parameters,INIFILE
 
 	#Proceso de INIFILE 
 	console_msgbox('ok','Cargando archivo de parámetros de Aplicación')
@@ -662,7 +665,7 @@ def main():
 		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
 		table_parameters={}
 
-	table_parameters_initial=table_parameters.copy()
+	# table_parameters_initial=table_parameters.copy()
 
 	validate_table_parameters()
 
@@ -725,6 +728,11 @@ def main():
 	# 	fic.write(json.dumps(table_parameters,indent=4))
 	# 	fic.close()
 
+	try:
+		with open(DATABASE+'.json') as file: table_parameters_initial = json.load(file)
+	except:
+		console_msgbox('alert','archivo Json: <{}> no existe. Se crea plantilla vacía...'.format(DATABASE+'.json'),True)
+		table_parameters_initial={}
 
 	if table_parameters==table_parameters_initial:
 		pass
@@ -735,7 +743,7 @@ def main():
 		fic.write(json.dumps(table_parameters,indent=4))
 		fic.close()
 		console_msgbox('alert','GUARDANDO respaldo')
-		fic = open('bal/'+DATABASE+'_{}.json'.format(date_time_now()), "w")
+		fic = open('bak/'+DATABASE+'_{}.json'.format(date_time_now()), "w")
 		fic.write(json.dumps(table_parameters_initial,indent=4))
 		fic.close()
 

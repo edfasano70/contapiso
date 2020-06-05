@@ -14,7 +14,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
                 "enabled": false,
                 "decimal_places": 0,
@@ -28,9 +27,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "codigo": {
                 "type": "str",
@@ -39,9 +38,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "fecha": {
                 "type": "str",
@@ -50,9 +49,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "descripcion": {
                 "type": "str",
@@ -61,9 +60,9 @@
                 "capitalize": "upper",
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "debe": {
                 "type": "float",
@@ -72,7 +71,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789.",
                 "visible": true,
                 "enabled": true,
                 "decimal_places": 2,
@@ -86,7 +84,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789.",
                 "visible": true,
                 "enabled": true,
                 "decimal_places": 2,
@@ -110,7 +107,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
                 "enabled": false,
                 "decimal_places": 0,
@@ -124,9 +120,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "piso": {
                 "type": "str",
@@ -135,9 +131,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "local": {
                 "type": "str",
@@ -146,9 +142,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ./-"
             },
             "propietario": {
                 "type": "str",
@@ -157,9 +153,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "inquilino": {
                 "type": "str",
@@ -168,9 +164,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "alicuota": {
                 "type": "float",
@@ -207,9 +203,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "contacto_tlf": {
                 "type": "str",
@@ -218,9 +214,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "contacto_email": {
                 "type": "str",
@@ -229,16 +225,16 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@._",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             }
         }
     },
     "gastos": {
         "database": "condominio.db3",
         "table": "gastos",
-        "caption": "Gastos del Período",
+        "caption": "Gastos del Per\u00edodo",
         "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
         "header": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
         "footer": "FdlT",
@@ -250,7 +246,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
                 "enabled": false,
                 "decimal_places": 0,
@@ -264,20 +259,20 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "documento": {
                 "type": "str",
-                "caption": "DOC.Nº",
+                "caption": "DOC.N\u00ba",
                 "helper": "documento",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "descripcion": {
                 "type": "str",
@@ -286,9 +281,9 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": true,
-                "enabled": true
+                "enabled": true,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
             },
             "precio": {
                 "type": "float",
@@ -297,7 +292,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789.",
                 "visible": true,
                 "enabled": true,
                 "decimal_places": 2,
@@ -311,7 +305,6 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "0123456789.",
                 "visible": true,
                 "enabled": true,
                 "decimal_places": 2,
@@ -325,10 +318,11 @@
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
-                "allowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
                 "visible": false,
                 "enabled": false,
-                "decimal_places":2
+                "decimal_places": 2,
+                "min": null,
+                "max": null
             }
         }
     }
