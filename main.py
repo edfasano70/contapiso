@@ -613,10 +613,11 @@ def option_generate_invoices():
 	#		Genera todas las facturas y las guarda en pdf en la carpeta /pdf
 	global DATABASE,table,table_parameters,period
 	res=query_get(DATABASE,'SELECT * FROM locales')
-	print('Procesando ',end='')
+	print('Generando Facturas...')
+	total_invoices=int(res[-1]['id'])
 	for r in res:
 		generate_invoice(r,output='pdf')
-		print('..',end='')
+		console_progressbar(int(r['id']),total_invoices,30)
 
 def option_email_invoices():
 	console_msgbox('ok','Opción enviar facturas',enter=True)

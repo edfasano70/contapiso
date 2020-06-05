@@ -12,13 +12,10 @@ OTHER:
 
 PENDINGS
 
-	option_generate_receipts() <-falta pulirla
+	option_email_invoices()
 
-	option_email_receipts()
 
 IMPROVEMENTS
-
-	barra de progreso
 
 	opción limpieza que borre los baks
 
@@ -75,6 +72,10 @@ IMPROVEMENTS
 > nombre? <- tentativo: Contapiso
 > determinar si hay cambios en el descriptorio json y guardarlos... <-falta guardar un respaldo
 > archivo main.json
+> option_generate_invoices() <-falta pulirla
+> barra de progreso
+
+
 
 
 
