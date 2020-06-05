@@ -343,7 +343,7 @@ def generate_invoice(data,output='console'):
 	global DATABASE,period,table_parameters
 
 	#obtenemos el total de gastos
-	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{}'.format(period))
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE locales_codigo==\'0\' OR locales_codigo==\'\''.format(period))
 
 	subtotal 		=	res['subtotal']
 	reserva 		=	subtotal*10/100
@@ -356,13 +356,13 @@ def generate_invoice(data,output='console'):
 	if output=='console' or output=='pdf':
 		res=[]
 
-		res.append('Factura #{}'.format(1))
-		res.append('Local       : {}'.format(data['local']))
-		res.append('Propietario : {}'.format(data['propietario']))
-		if data['propietario']!=data['inquilino']: res.append('Inquilino   : {}'.format(data['inquilino']))
+		# res.append('Factura #{}'.format(1))
+		# res.append('Local       : {}'.format(data['local']))
+		# res.append('Propietario : {}'.format(data['propietario']))
+		# if data['propietario']!=data['inquilino']: res.append('Inquilino   : {}'.format(data['inquilino']))
 
 		table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
-		table_parameters['gastos_'+period]['sql']=table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+		table_parameters['gastos_'+period]['sql']='SELECT id, descripcion, precio, cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'0\' or locales_codigo==\'\''.format('gastos_'+period)       #table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
 
 		report_lines=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
 		table_parameters.pop('gastos_'+period)
@@ -370,8 +370,20 @@ def generate_invoice(data,output='console'):
 		max_width=0
 		firstRow=True
 		for rl in report_lines:
-			res.append(rl)
+			# res.append(rl)
 			if len(rl)>max_width: max_width=len(rl)
+
+		report_width_str='{:<'+str(max_width-1)+'}'
+
+		res.append(report_width_str.format('Factura #{}'.format(1)))
+		res.append(report_width_str.format('Local       : {}'.format(data['local'])))
+		res.append(report_width_str.format('Propietario : {}'.format(data['propietario'])))
+		if data['propietario']!=data['inquilino']: res.append(report_width_str.format('Inquilino   : {}'.format(data['inquilino'])))
+		res.append('')
+
+		for rl in report_lines:
+			res.append(rl)
+#			if len(rl)>max_width: max_width=len(rl)
 
 		report_width_str='{:>'+str(max_width-1)+'}'
 
@@ -410,10 +422,12 @@ def generate_invoice(data,output='console'):
 		filename=period+'_'+data['codigo']+'.pdf'
 		pdf = FPDF() 
 		pdf.add_page() 
-		pdf.set_font("Courier", size = 8) 
+		pdf.set_font("Courier", size = 7) 
 		pdf.image('resources/logo.jpg',10,6,30)
+		for i in range(0,10):
+			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0) 
 		for r in res: 
-			pdf.cell(0, 4, txt = r, ln = 1, align = 'C', border=0) 
+			pdf.cell(0, 3, txt = r, ln = 1, align = 'C', border=0) 
 		pdf.output('pdf/'+filename)
 	elif output=='html':
 		pass
@@ -618,6 +632,7 @@ def option_generate_invoices():
 	for r in res:
 		generate_invoice(r,output='pdf')
 		console_progressbar(int(r['id']),total_invoices,30)
+		break
 
 def option_email_invoices():
 	console_msgbox('ok','Opción enviar facturas',enter=True)
