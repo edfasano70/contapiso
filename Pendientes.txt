@@ -14,6 +14,8 @@ PENDINGS
 
 	option_email_invoices()
 
+	número de la primera factura
+
 
 IMPROVEMENTS
 

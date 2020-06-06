@@ -1,6 +1,5 @@
 {
     "database": "database/condominio.db3",
-    "table": "gastos_012020",
     "period": "012020",
     "sender_email": "alvafasa@gmail.com",
     "sender_password": "Irama2017"

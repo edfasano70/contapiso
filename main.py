@@ -303,8 +303,8 @@ def validate_app_parameters():
 	console_msgbox('ok','Validando parámetros de Aplicación')
 	assign_value_2_dictkey(app_parameters,'database',DATABASE)
 	DATABASE=app_parameters['database']
-	assign_value_2_dictkey(app_parameters,'table',table)
-	table=app_parameters['table']
+	# assign_value_2_dictkey(app_parameters,'table',table)
+	# table=app_parameters['table']
 	assign_value_2_dictkey(app_parameters,'period',period)
 	period=app_parameters['period']
 	assign_value_2_dictkey(app_parameters,'sender_email','some@gmail.com')
@@ -425,8 +425,10 @@ def generate_invoice(data,output='console'):
 		filename=period+'_'+data['codigo']+'.pdf'
 		pdf = FPDF() 
 		pdf.add_page() 
-		pdf.set_font("Courier", size = 7) 
-		pdf.image('resources/logo.jpg',10,6,30)
+		pdf.set_font("Courier", size = 8) 
+		# pdf.image('resources/logo.jpg',10,6,30)
+		pdf.image('resources/header.jpg',5,0,200)
+		pdf.image('resources/footer.jpg',5,270,200)
 		for i in range(0,10):
 			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0) 
 		for r in res: 
@@ -747,7 +749,6 @@ def main():
 		fic.write(json.dumps(table_parameters_initial,indent=4))
 		fic.close()
 
-	app_parameters['table']=table
 	app_parameters['period']=period
 
 	if app_parameters==app_parameters_initial:
