@@ -365,7 +365,7 @@ def generate_invoice(data,output='console'):
 		# if data['propietario']!=data['inquilino']: res.append('Inquilino   : {}'.format(data['inquilino']))
 
 		table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
-		table_parameters['gastos_'+period]['sql']='SELECT id, descripcion, precio, cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'0\' or locales_codigo==\'\''.format('gastos_'+period)       #table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+		table_parameters['gastos_'+period]['sql']='SELECT descripcion, precio, cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'0\' or locales_codigo==\'\''.format('gastos_'+period)       #table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
 
 		report_lines=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
 		table_parameters.pop('gastos_'+period)

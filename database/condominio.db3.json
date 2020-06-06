@@ -276,7 +276,7 @@
             },
             "descripcion": {
                 "type": "str",
-                "caption": "DESCRIPCION",
+                "caption": "DESCRIPCION GASTO",
                 "helper": "descripcion",
                 "capitalize": null,
                 "lenght_min": null,
@@ -287,7 +287,7 @@
             },
             "precio": {
                 "type": "float",
-                "caption": "PRECIO(Bs)",
+                "caption": "MONTO(Bs)",
                 "helper": "precio",
                 "capitalize": null,
                 "lenght_min": null,
@@ -299,15 +299,15 @@
                 "max": null
             },
             "cantidad": {
-                "type": "float",
-                "caption": "CANT.(UNIDS)",
+                "type": "int",
+                "caption": "CANT.",
                 "helper": "cantidad",
                 "capitalize": null,
                 "lenght_min": null,
                 "lenght_max": null,
                 "visible": true,
                 "enabled": true,
-                "decimal_places": 2,
+                "decimal_places": 0,
                 "min": null,
                 "max": null
             },
