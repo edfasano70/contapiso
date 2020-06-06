@@ -6,7 +6,7 @@ from condo import *
 
 APP_NAME	=	'Sistema de Gestión Condominial'
 APP_ALIAS	=	'Contapiso'
-VERSION 	=	'0.2.5 alpha'
+VERSION 	=	'0.2.9 pre-beta'
 
 INIFILE 	=	__name__.replace('_','')+'.json'
 DATABASE 	=	'database/condominio.db3'
@@ -341,7 +341,7 @@ def import_xls_into_table(): # <- falta descripción
 	# input()
 	table_defrag(DATABASE,table)
 
-def generate_invoice(data,output='console'):
+def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='console'):
 	#output puede ser console, html, pdf
 	global DATABASE,period,table_parameters
 
@@ -355,6 +355,8 @@ def generate_invoice(data,output='console'):
 	saldo 			= 	data['saldo']
 	interes_mora	=	saldo/100
 	monto_alicuota	=	total_gastos*alicuota/100
+
+	fondo_reserva	=	35000000
 
 	if output=='console' or output=='pdf':
 		res=[]
@@ -373,20 +375,18 @@ def generate_invoice(data,output='console'):
 		max_width=0
 		firstRow=True
 		for rl in report_lines:
-			# res.append(rl)
 			if len(rl)>max_width: max_width=len(rl)
 
 		report_width_str='{:<'+str(max_width-1)+'}'
 
-		res.append(report_width_str.format('Factura #{}'.format(1)))
-		res.append(report_width_str.format('Local       : {}'.format(data['local'])))
-		res.append(report_width_str.format('Propietario : {}'.format(data['propietario'])))
-		if data['propietario']!=data['inquilino']: res.append(report_width_str.format('Inquilino   : {}'.format(data['inquilino'])))
-		res.append('')
+		# res.append(report_width_str.format('Factura #{}'.format(1)))
+		# res.append(report_width_str.format('Local       : {}'.format(data['local'])))
+		# res.append(report_width_str.format('Propietario : {}'.format(data['propietario'])))
+		# if data['propietario']!=data['inquilino']: res.append(report_width_str.format('Inquilino   : {}'.format(data['inquilino'])))
+		# res.append('')
 
 		for rl in report_lines:
 			res.append(rl)
-#			if len(rl)>max_width: max_width=len(rl)
 
 		report_width_str='{:>'+str(max_width-1)+'}'
 
@@ -425,15 +425,64 @@ def generate_invoice(data,output='console'):
 		filename=period+'_'+data['codigo']+'.pdf'
 		pdf = FPDF() 
 		pdf.add_page() 
-		pdf.set_font("Courier", size = 8) 
+		pdf.set_font("Courier", size = 10, style='B') 
 		# pdf.image('resources/logo.jpg',10,6,30)
 		pdf.image('resources/header.jpg',5,0,200)
 		pdf.image('resources/footer.jpg',5,270,200)
-		for i in range(0,10):
-			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0) 
+		for i in range(0,6):
+			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0)
+		pdf.cell(0,5,txt='Fecha: {}'.format(invoice_date),ln=1,align='R',border=0)
+		pdf.set_text_color(255,0,0)
+		pdf.cell(0,5,txt='Recibo Nº {}'.format(invoice_number),ln=1,align='R',border=0)
+		pdf.set_text_color(0,0,0)
+		pdf.cell(0,5,txt='RECIBO DE CONDOMINIO',align='C',ln=1)
+		pdf.set_font("Courier", size = 8, style='B')
+		pdf.set_fill_color(200,200,200) 
+		pdf.cell(40,5,txt='LOCAL',ln=0,align='C',border=1,fill=True) 
+		pdf.cell(75,5,txt='PROPIETARIO',ln=0,align='C',border=1,fill=True) 
+		pdf.cell(75,5,txt='INQUILINO',ln=1,align='C',border=1,fill=True) 
+		pdf.set_font("Courier", size = 8) 
+		pdf.cell(40,5,txt=data['local'],ln=0,align='C',border=1) 
+		pdf.cell(75,5,txt=data['propietario'],ln=0,align='C',border=1) 
+		pdf.cell(75,5,txt=data['inquilino'],ln=1,align='C',border=1)
+
+		pdf.set_font("Courier", size = 8, style='B') 
+		pdf.cell(0,3,ln=1)
+		pdf.cell(0,5,txt='RELACION DE GASTOS COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+		pdf.cell(0,3,ln=1)
+		pdf.set_font("Courier", size = 8) 
+
+
+		pdf.set_font("Courier",size=7.5)
 		for r in res: 
 			pdf.cell(0, 3, txt = r, ln = 1, align = 'C', border=0) 
+
+		pdf.cell(0,8,txt='',ln=1,border=0,fill=False)
+
+		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
+		pdf.cell(30,5,txt='',ln=0,border=0,fill=False)
+		pdf.cell(35,5,txt='Saldo Anterior (Bs)',ln=0,border=1,fill=True,align='C')
+		pdf.cell(35,5,txt='Cargo (Bs)',ln=0,border=1,fill=True,align='C')
+		pdf.cell(35,5,txt='Abono (Bs)',ln=0,border=1,fill=True,align='C')
+		pdf.cell(35,5,txt='Total (Bs)',ln=1,border=1,fill=True,align='C')
+
+		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
+		pdf.cell(30,5,txt='Fondo de Reserva',ln=0,border=1,fill=True,align='C')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(reserva),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva+reserva),ln=1,border=1,fill=False,align='R')
+
+		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
+		pdf.cell(30,5,txt='Por cobrar a Ud.',ln=0,border=1,fill=True,align='C')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(monto_alicuota),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+monto_alicuota),ln=1,border=1,fill=False,align='R')
+
 		pdf.output('pdf/'+filename)
+
+
 	elif output=='html':
 		pass
 	else:
@@ -631,11 +680,13 @@ def option_generate_invoices():
 	#	Función:
 	#		Genera todas las facturas y las guarda en pdf en la carpeta /pdf
 	global DATABASE,table,table_parameters,period
+	invoice_number=int(console_input('Número del primer recibo?',default='1'))
+	invoice_date=console_input('Fecha a imprimir?',default='01/01/2020')
 	res=query_get(DATABASE,'SELECT * FROM locales')
 	print('Generando Facturas...')
 	total_invoices=int(res[-1]['id'])
 	for r in res:
-		generate_invoice(r,output='pdf')
+		generate_invoice(r,output='pdf',invoice_number=invoice_number,date=invoice_date)
 		console_progressbar(int(r['id']),total_invoices,30)
 		break
 
