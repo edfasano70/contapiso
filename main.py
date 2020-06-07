@@ -361,11 +361,6 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 	if output=='console' or output=='pdf':
 		res=[]
 
-		# res.append('Factura #{}'.format(1))
-		# res.append('Local       : {}'.format(data['local']))
-		# res.append('Propietario : {}'.format(data['propietario']))
-		# if data['propietario']!=data['inquilino']: res.append('Inquilino   : {}'.format(data['inquilino']))
-
 		table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
 		table_parameters['gastos_'+period]['sql']='SELECT descripcion, precio, cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'0\' or locales_codigo==\'\''.format('gastos_'+period)       #table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
 
@@ -378,12 +373,6 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 			if len(rl)>max_width: max_width=len(rl)
 
 		report_width_str='{:<'+str(max_width-1)+'}'
-
-		# res.append(report_width_str.format('Factura #{}'.format(1)))
-		# res.append(report_width_str.format('Local       : {}'.format(data['local'])))
-		# res.append(report_width_str.format('Propietario : {}'.format(data['propietario'])))
-		# if data['propietario']!=data['inquilino']: res.append(report_width_str.format('Inquilino   : {}'.format(data['inquilino'])))
-		# res.append('')
 
 		for rl in report_lines:
 			res.append(rl)
