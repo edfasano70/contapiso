@@ -429,6 +429,7 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 		# pdf.image('resources/logo.jpg',10,6,30)
 		pdf.image('resources/header.jpg',5,0,200)
 		pdf.image('resources/footer.jpg',5,270,200)
+		pdf.image('resources/cuadro_pago.jpg',5,215,200)
 		for i in range(0,6):
 			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0)
 		pdf.cell(0,5,txt='Fecha: {}'.format(invoice_date),ln=1,align='R',border=0)
@@ -478,7 +479,7 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='{:>15,.2f}'.format(monto_alicuota),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+monto_alicuota),ln=1,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+monto_alicuota+interes_mora),ln=1,border=1,fill=False,align='R')
 
 		pdf.output('pdf/'+filename)
 
@@ -686,7 +687,7 @@ def option_generate_invoices():
 	print('Generando Facturas...')
 	total_invoices=int(res[-1]['id'])
 	for r in res:
-		generate_invoice(r,output='pdf',invoice_number=invoice_number,date=invoice_date)
+		generate_invoice(r,output='pdf',invoice_number=invoice_number,invoice_date=invoice_date)
 		console_progressbar(int(r['id']),total_invoices,30)
 		break
 
