@@ -1,6 +1,6 @@
 # modulo de rutinas del programa condominio
 import json
-import condo
+# import condo
 import fpdf
 from fpdf import FPDF
 import yagmail

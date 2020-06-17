@@ -235,7 +235,7 @@
         "database": "condominio.db3",
         "table": "gastos",
         "caption": "Gastos del Per\u00edodo",
-        "sql": "SELECT id,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
+        "sql": "SELECT id,type,locales_codigo,documento,descripcion,precio,cantidad,precio*cantidad AS subtotal FROM gastos",
         "header": "EDIFICIO GALERIAS MIRANDA\nGASTOS DEL PERIODO\n",
         "footer": "FdlT",
         "columns": {
@@ -323,6 +323,17 @@
                 "decimal_places": 2,
                 "min": null,
                 "max": null
+            },
+            "type": {
+                "type": "str",
+                "caption": "TIPO",
+                "helper": "Tipo de gasto (Gasto,Fondo)",
+                "capitalize": "upper",
+                "lenght_min": null,
+                "lenght_max": null,
+                "allowed_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+                "visible": true,
+                "enabled": true
             }
         }
     }

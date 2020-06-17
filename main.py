@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Programa de gestión de gastos de condominio
 
-from condo import *
+from contapiso import *
 
 APP_NAME	=	'Sistema de Gestión Condominial'
 APP_ALIAS	=	'Contapiso'
@@ -73,13 +73,23 @@ def new_period():
 	global DATABASE,period
 	if 'gastos_'+period not in database_table_list(DATABASE):
 
-		create_gastos_sql="CREATE TABLE gastos{} ( \
-		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
-		    locales_codigo VARCHAR( 10 ),\
-		    documento      VARCHAR( 80 ),\
-		    descripcion    VARCHAR( 80 ),\
-		    precio         REAL           DEFAULT ( 0.0 ),\
-		    cantidad       REAL           DEFAULT ( 0.0 ));".format('_'+period)
+		create_gastos_sql="CREATE TABLE gastos{} (\
+		    id             INTEGER      PRIMARY KEY ASC AUTOINCREMENT,\
+		    type           VARCHAR (4)  DEFAULT G,\
+		    locales_codigo VARCHAR (10) DEFAULT (0),\
+		    documento      VARCHAR (80),\
+		    descripcion    VARCHAR (80),\
+		    precio         REAL         DEFAULT (0.0),\
+		    cantidad       REAL         DEFAULT (0.0) \
+		);".format('_'+period)
+
+		# create_gastos_sql="CREATE TABLE gastos{} ( \
+		#     id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
+		#     locales_codigo VARCHAR( 10 ),\
+		#     documento      VARCHAR( 80 ),\
+		#     descripcion    VARCHAR( 80 ),\
+		#     precio         REAL           DEFAULT ( 0.0 ),\
+		#     cantidad       REAL           DEFAULT ( 0.0 ));".format('_'+period)
 
 		con = lite.connect(DATABASE)
 		cur = con.cursor()
@@ -218,20 +228,32 @@ def validate_table_parameters():
 
 	if 'gastos' not in tmp:
 
-		create_gastos_sql="CREATE TABLE gastos ( \
-		    id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
-		    locales_codigo VARCHAR( 10 ),\
-		    documento      VARCHAR( 80 ),\
-		    descripcion    VARCHAR( 80 ),\
-		    precio         REAL           DEFAULT ( 0.0 ),\
-		    cantidad       REAL           DEFAULT ( 0.0 ));"
+		create_gastos_sql="CREATE TABLE gastos{} (\
+		    id             INTEGER      PRIMARY KEY ASC AUTOINCREMENT,\
+		    type           VARCHAR (4)  DEFAULT G,\
+		    locales_codigo VARCHAR (10) DEFAULT (0),\
+		    documento      VARCHAR (80),\
+		    descripcion    VARCHAR (80),\
+		    precio         REAL         DEFAULT (0.0),\
+		    cantidad       REAL         DEFAULT (0.0) \
+		);".format('')
 
-		con = lite.connect(DATABASE)
-		cur = con.cursor()
-		cur.execute(create_gastos_sql)
-		con.close()
+		# create_gastos_sql="CREATE TABLE gastos ( \
+		#     id             INTEGER        PRIMARY KEY ASC AUTOINCREMENT, \
+		#     locales_codigo VARCHAR( 10 ),\
+		#     documento      VARCHAR( 80 ),\
+		#     descripcion    VARCHAR( 80 ),\
+		#     precio         REAL           DEFAULT ( 0.0 ),\
+		#     cantidad       REAL           DEFAULT ( 0.0 ));"
 
-		row_insert(database,'gastos',{'id':1})
+		query_get(DATABASE,create_gastos_sql)
+
+		# con = lite.connect(DATABASE)
+		# cur = con.cursor()
+		# cur.execute(create_gastos_sql)
+		# con.close()
+
+		row_insert(DATABASE,'gastos',{'id':1})
 
 		tmp.append('gastos')
 
@@ -292,6 +314,8 @@ def validate_table_parameters():
 			assign_value_2_dictkey(vt_c2,'visible',True)
 			assign_value_2_dictkey(vt_c2,'enabled',True)
 
+	table_drop(DATABASE,'gastos')
+
 def validate_app_parameters():
 	#	Función:
 	#		Valida el dict 'table_parameters' que contiene toda la información de despliegue de las tablas
@@ -316,6 +340,10 @@ def export_table_to_xls(): # <-falta descripcion
 	query=query_get(DATABASE,'SELECT * FROM {}'.format(table))
 	first_row=True
 	data_dict={}
+
+	total_records=len(query)
+
+	i=0
 	for q in query:
 		if first_row:
 			first_row=False
@@ -324,6 +352,9 @@ def export_table_to_xls(): # <-falta descripcion
 				assign_value_2_dictkey(data_dict,r,[])
 		for r in row_keys:
 			data_dict[r].append(q[r])
+		console_progressbar(i,total_records,30)
+		i+=1
+
 	data_frame=pd.DataFrame.from_dict(data_dict)
 	data_frame.to_excel('xls/{}.xlsx'.format(table), sheet_name=table, index=False)
 
@@ -333,12 +364,13 @@ def import_xls_into_table(): # <- falta descripción
 	data_frame=pd.read_excel('xls/{}.xlsx'.format(table))#, sheet_name=table)
 	data_frame=data_frame.fillna('')
 	data_dict=data_frame.to_dict('records')
+
+	total_records=len(data_dict)
+
 	for d in data_dict:
-		# print('\nrecord')
-		# print(d)
+		console_progressbar(int(d['id']),total_records,30)
 		d.pop('id')
 		row_insert(DATABASE,table,d)
-	# input()
 	table_defrag(DATABASE,table)
 
 def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='console'):
@@ -786,7 +818,7 @@ def main():
 		fic.write(json.dumps(table_parameters,indent=4))
 		fic.close()
 		console_msgbox('alert','GUARDANDO respaldo')
-		fic = open('bak/'+DATABASE+'_{}.json'.format(date_time_now()), "w")
+		fic = open('bak/'+DATABASE+'{}.json'.format('')) #format(date_time_now()), "w")
 		fic.write(json.dumps(table_parameters_initial,indent=4))
 		fic.close()
 

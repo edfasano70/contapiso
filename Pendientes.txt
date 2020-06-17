@@ -12,10 +12,16 @@ OTHER:
 
 PENDINGS
 
+	gastos -> expenses_period
+	locales -> buiding_units
+	libro -> account_book
+
 	option_email_invoices()
 
-	número de la primera factura
-
+	parámetros del recibo:
+		fecha
+		número de la primera factura
+		monto del fondo de reserva
 
 IMPROVEMENTS
 
@@ -76,6 +82,9 @@ IMPROVEMENTS
 > archivo main.json
 > option_generate_invoices() <-falta pulirla
 > barra de progreso
+> eliminar la tabla gastos en validate
+> barra de progreso en importar de xlsx 
+> barra de progreso en exportar a xlsx
 
 
 
