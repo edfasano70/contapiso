@@ -156,14 +156,18 @@ def table_crud_management():
 		print(header+'\n')
 
 		firstRow=True
-		for rl in renderTableAuto(DATABASE,table_parameters[table]):
-			if len(rl)>terminal_width:
-				rl=rl[0:terminal_width]
-			if firstRow: 
-				print(Style.BRIGHT+rl+Style.RESET_ALL)
-				firstRow=False
-			else:
-				print(rl+Style.RESET_ALL)
+		render=renderTableAuto(DATABASE,table_parameters[table])
+		if render!=None:
+			for rl in render:
+				if len(rl)>terminal_width:
+					rl=rl[0:terminal_width]
+				if firstRow: 
+					print(Style.BRIGHT+rl+Style.RESET_ALL)
+					firstRow=False
+				else:
+					print(rl+Style.RESET_ALL)
+		else:
+			print('La tabla está vacía...')
 
 		print('\n'+table_parameters[table].get('footer','FdlT\n'))
 
@@ -378,58 +382,107 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 	global DATABASE,period,table_parameters
 
 	#obtenemos el total de gastos
-	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE locales_codigo==\'0\' OR locales_codigo==\'\''.format(period))
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE (locales_codigo==\'0\' OR locales_codigo==\'\') AND type==\'G\''.format(period))
+	subtotal_gastos_comunes	= res['subtotal']
 
-	subtotal 		=	res['subtotal']
-	reserva 		=	subtotal*10/100
-	total_gastos	=	subtotal+reserva
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE locales_codigo==\'{}\' AND type==\'G\''.format(period,data['id']))
+	total_gastos_no_comunes = res['subtotal']
+
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE (locales_codigo==\'0\' OR locales_codigo==\'\') AND type==\'F\''.format(period))
+	fondos_comunes = res['subtotal']
+
+	res=row_query_get(DATABASE,'SELECT SUM(precio*cantidad) as subtotal from gastos_{} WHERE locales_codigo==\'{}\' AND type==\'F\''.format(period,data['id']))
+	fondos_no_comunes =	res['subtotal']
+
+	fondo_reserva 	=	subtotal_gastos_comunes*10/100
+	total_gastos_comunes	=	subtotal_gastos_comunes+fondo_reserva
 	alicuota 		=	data['alicuota']
 	saldo 			= 	data['saldo']
 	interes_mora	=	saldo/100
-	monto_alicuota	=	total_gastos*alicuota/100
-
-	fondo_reserva	=	35000000
+	gastos_x_alicuota	=	total_gastos_comunes*alicuota/100
+	total_a_pagar 	=	gastos_x_alicuota+total_gastos_no_comunes+saldo+interes_mora
+	# input(total_a_pagar)
+	total_fondo_reserva	=	35000000
 
 	if output=='console' or output=='pdf':
-		res=[]
 
-		table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
-		table_parameters['gastos_'+period]['sql']='SELECT descripcion, precio, cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'0\' or locales_codigo==\'\''.format('gastos_'+period)       #table_parameters['gastos']['sql'].replace('gastos','gastos_'+period)
+		# table_parameters['gastos_'+period]=table_parameters['gastos'].copy()
 
-		report_lines=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
-		table_parameters.pop('gastos_'+period)
+		report_gastos_comunes=query_get(DATABASE,"SELECT descripcion,precio,cantidad,precio*cantidad AS subtotal \
+			FROM gastos{} WHERE (locales_codigo=='0' OR locales_codigo=='') AND type='G'".format('_'+period))
 
-		max_width=0
-		firstRow=True
-		for rl in report_lines:
-			if len(rl)>max_width: max_width=len(rl)
+		report_gastos_no_comunes=query_get(DATABASE,"SELECT descripcion,precio,cantidad,precio*cantidad AS subtotal \
+			FROM gastos{} WHERE locales_codigo=='{}' AND type='G'".format('_'+period,data['id']))
 
-		report_width_str='{:<'+str(max_width-1)+'}'
+		report_fondos_comunes=query_get(DATABASE,"SELECT descripcion,precio,cantidad,precio*cantidad AS subtotal \
+			FROM gastos{} WHERE (locales_codigo=='0' OR locales_codigo=='') AND type='F'".format('_'+period))
 
-		for rl in report_lines:
-			res.append(rl)
+		report_fondos_no_comunes=query_get(DATABASE,"SELECT descripcion,precio,cantidad,precio*cantidad AS subtotal \
+			FROM gastos{} WHERE locales_codigo=='{}' AND type='F'".format('_'+period,data['id']))
 
-		report_width_str='{:>'+str(max_width-1)+'}'
 
-		separator='-------------------------------------------'
-		res.append(report_width_str.format(separator))
 
-		res.append(report_width_str.format('SUBTOTAL (Bs): {:>15,.2f}'.format(subtotal)))
-		res.append(report_width_str.format('RESERVA (10%) (Bs): {:>15,.2f}'.format(reserva)))
-		res.append(report_width_str.format(separator))
+		# table_parameters['gastos_'+period]['sql']='SELECT descripcion, precio,\
+		# 	cantidad, precio*cantidad as subtotal FROM {} WHERE (locales_codigo==\'0\' \
+		# 	or locales_codigo==\'\') AND type=\'F\''.format('gastos_'+period)
 
-		res.append(report_width_str.format('TOTAL (Bs): {:>15,.2f}'.format(total_gastos)))
-		res.append(report_width_str.format(separator))
+		# report_fondos_comunes=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
 
-		res.append(report_width_str.format('{:>25}{:>55}'.format('ALICUOTA (%): {:>7,.4f}'.format(alicuota),'MONTO x ALICUOTA (Bs): {:>15,.2f}'.format(monto_alicuota))))
-		tmp1='SALDO MES(ES) ANTERIOR(ES) (Bs): {:>15,.2f}'.format(saldo)
-		res.append(report_width_str.format(tmp1))
-		tmp1='INTERES DE MORA (1%) (Bs): {:>15,.2f}'.format(interes_mora)
-		res.append(report_width_str.format(tmp1))
-		total_a_pagar=monto_alicuota+saldo+interes_mora
-		res.append(report_width_str.format(separator))
-		tmp1='TOTAL A PAGAR (Bs): {:>15,.2f}'.format(total_a_pagar)
-		res.append(report_width_str.format(tmp1))
+		# table_parameters['gastos_'+period]['sql']='SELECT descripcion, precio,\
+		# 	cantidad, precio*cantidad as subtotal FROM {} WHERE locales_codigo==\'{}\' \
+		# 	AND type=\'F\''.format('gastos_'+period,data['id'])
+
+		# report_fondos_no_comunes=renderTableAuto(DATABASE,table_parameters['gastos_'+period])
+
+		# table_parameters.pop('gastos_'+period)
+
+		# max_width=0
+		# # firstRow=True
+
+		# if report_gastos_comunes!=None:
+		# 	for rl in report_gastos_comunes:
+		# 		if len(rl)>max_width: max_width=len(rl)
+
+		# if report_gastos_no_comunes!=None:		
+		# 	for rl in report_gastos_no_comunes:
+		# 		if len(rl)>max_width: max_width=len(rl)
+
+		# if report_fondos_comunes!=None:
+		# 	for rl in report_fondos_comunes:
+		# 		if len(rl)>max_width: max_width=len(rl)
+
+		# if report_fondos_no_comunes!=None:
+		# 	for rl in report_fondos_no_comunes:
+		# 		if len(rl)>max_width: max_width=len(rl)
+
+		# report_width_str='{:>'+str(max_width-1)+'}'
+
+		# res=[]
+		# # for rl in report_lines:
+		# # 	res.append(rl)
+		# max_width=80
+		# report_width_str='{:>'+str(max_width-1)+'}'
+
+		# separator='-------------------------------------------'
+		# res.append(report_width_str.format(separator))
+
+		# res.append(report_width_str.format('SUBTOTAL (Bs): {:>15,.2f}'.format(subtotal_gastos_comunes)))
+		# res.append(report_width_str.format('RESERVA (10%) (Bs): {:>15,.2f}'.format(fondo_reserva)))
+		# res.append(report_width_str.format(separator))
+
+		# res.append(report_width_str.format('TOTAL (Bs): {:>15,.2f}'.format(total_gastos_comunes)))
+		# res.append(report_width_str.format(separator))
+
+		# res.append(report_width_str.format('{:>25}{:>55}'.format('ALICUOTA (%): {:>7,.4f}'.format(alicuota),'MONTO x ALICUOTA (Bs): {:>15,.2f}'.format(gastos_x_alicuota))))
+		# tmp1='SALDO MES(ES) ANTERIOR(ES) (Bs): {:>15,.2f}'.format(saldo)
+		# res.append(report_width_str.format(tmp1))
+		# tmp1='INTERES DE MORA (1%) (Bs): {:>15,.2f}'.format(interes_mora)
+		# res.append(report_width_str.format(tmp1))
+
+		# total_a_pagar=gastos_x_alicuota+saldo+interes_mora
+		# res.append(report_width_str.format(separator))
+		# tmp1='TOTAL A PAGAR (Bs): {:>15,.2f}'.format(total_a_pagar)
+		# res.append(report_width_str.format(tmp1))
 
 	elif output=='html':
 		pass
@@ -447,10 +500,9 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 		pdf = FPDF() 
 		pdf.add_page() 
 		pdf.set_font("Courier", size = 10, style='B') 
-		# pdf.image('resources/logo.jpg',10,6,30)
 		pdf.image('resources/header.jpg',5,0,200)
-		pdf.image('resources/footer.jpg',5,270,200)
-		pdf.image('resources/cuadro_pago.jpg',5,215,200)
+		pdf.image('resources/footer.jpg',5,280,200)
+		pdf.image('resources/cuadro_pago.jpg',5,230,200)
 		for i in range(0,6):
 			pdf.cell(0, 3, txt = '', ln = 1, align = 'C', border=0)
 		pdf.cell(0,5,txt='Fecha: {}'.format(invoice_date),ln=1,align='R',border=0)
@@ -468,16 +520,123 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 		pdf.cell(75,5,txt=data['propietario'],ln=0,align='C',border=1) 
 		pdf.cell(75,5,txt=data['inquilino'],ln=1,align='C',border=1)
 
+		# pdf.set_font("Courier", size = 8, style='B') 
+		# pdf.cell(0,3,ln=1)
+		# pdf.cell(0,5,txt='RELACION DE GASTOS COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+		# pdf.cell(0,3,ln=1)
+		# pdf.set_font("Courier", size = 8) 
+
+		# for r in res: 
+		# 	pdf.set_font("Courier",size=7.5)
+		# 	pdf.cell(0, 3, txt = r, ln = 1, align = 'C', border=0) 
+
+		if report_gastos_comunes!=None:
+			pdf.set_font("Courier", size = 8, style='B') 
+			pdf.cell(0,3,ln=1)
+			pdf.cell(0,5,txt='RELACION DE GASTOS COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+			pdf.cell(0,3,ln=1)
+			pdf.set_font("Courier", size = 8) 
+
+			# for r in report_gastos_comunes: 
+			# 	pdf.set_font("Courier",size=7.5)
+			# 	pdf.cell(0, 3, txt = r, ln = 1, align = 'R', border=0)
+
+			pdf.set_font("Courier",size=7.5, style='B')
+			pdf.cell(130, 3, txt = str('DESCRIPCION'), ln = 0, align = 'C', border=0)
+			pdf.cell(25, 3, txt = str('PRECIO Bs'), ln = 0, align = 'C', border=0)
+			pdf.cell(10, 3, txt = str('CANT'), ln = 0, align = 'C', border=0)
+			pdf.cell(25, 3, txt = str('SUBTOTAL Bs'), ln = 1, align = 'C', border=0)
+			for r in report_gastos_comunes:
+				pdf.set_font("Courier",size=7.5)
+				pdf.cell(130, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
+				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['precio']), ln = 0, align = 'R', border=0)
+				pdf.cell(10, 3, txt = '{:,.2f}'.format(r['cantidad']), ln = 0, align = 'R', border=0)
+				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+			pdf.set_font("Courier",size=7.5, style='B')
+			pdf.cell(165, 3, txt = 'SUBTOTAL Bs', ln = 0, align = 'R', border=0)
+			pdf.cell(25, 3, txt = '{:,.2f}'.format(subtotal_gastos_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(165, 3, txt = 'FONDO DE RESERVA (10%) Bs', ln = 0, align = 'R', border=0)
+			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondo_reserva), ln = 1, align = 'R', border=0)
+			pdf.cell(165, 3, txt = 'TOTAL GASTOS COMUNES Bs', ln = 0, align = 'R', border=0)
+			pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_comunes), ln = 1, align = 'R', border=0)
+
+
+		if report_gastos_no_comunes!=None:
+			pdf.set_font("Courier", size = 8, style='B') 
+			pdf.cell(0,3,ln=1)
+			pdf.cell(0,5,txt='RELACION DE GASTOS NO COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+			pdf.cell(0,3,ln=1)
+			pdf.set_font("Courier", size = 8) 
+
+			pdf.set_font("Courier",size=7.5, style='B')
+			pdf.cell(130, 3, txt = str('DESCRIPCION'), ln = 0, align = 'C', border=0)
+			pdf.cell(25, 3, txt = str('PRECIO Bs'), ln = 0, align = 'C', border=0)
+			pdf.cell(10, 3, txt = str('CANT'), ln = 0, align = 'C', border=0)
+			pdf.cell(25, 3, txt = str('SUBTOTAL Bs'), ln = 1, align = 'C', border=0)
+			for r in report_gastos_no_comunes:
+				pdf.set_font("Courier",size=7.5)
+				pdf.cell(130, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
+				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['precio']), ln = 0, align = 'R', border=0)
+				pdf.cell(10, 3, txt = '{:,.2f}'.format(r['cantidad']), ln = 0, align = 'R', border=0)
+				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+			pdf.set_font("Courier",size=7.5, style='B')
+			pdf.cell(165, 3, txt = 'TOTAL GASTOS NO COMUNES Bs', ln = 0, align = 'R', border=0)
+			pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
+
+			# for r in report_gastos_no_comunes: 
+			# 	pdf.set_font("Courier",size=7.5)
+			# 	pdf.cell(0, 3, txt = r, ln = 1, align = 'R', border=0)
+
+		# if report_fondos_comunes!=None:
+		# 	pdf.set_font("Courier", size = 8, style='B') 
+		# 	pdf.cell(0,3,ln=1)
+		# 	pdf.cell(0,5,txt='FONDOS DE RESERVA COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+		# 	pdf.cell(0,3,ln=1)
+		# 	pdf.set_font("Courier", size = 8) 
+
+		# 	for r in report_fondos_comunes: 
+		# 		pdf.set_font("Courier",size=7.5)
+		# 		pdf.cell(0, 3, txt = r, ln = 1, align = 'R', border=0)
+
+		# if report_fondos_no_comunes!=None:
+		# 	pdf.set_font("Courier", size = 8, style='B') 
+		# 	pdf.cell(0,3,ln=1)
+		# 	pdf.cell(0,5,txt='FONDOS DE RESERVA NO COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+		# 	pdf.cell(0,3,ln=1)
+		# 	pdf.set_font("Courier", size = 8) 
+
+		# 	for r in report_fondos_no_comunes: 
+		# 		pdf.set_font("Courier",size=7.5)
+		# 		pdf.cell(0, 3, txt = r, ln = 1, align = 'R', border=0)
+
 		pdf.set_font("Courier", size = 8, style='B') 
 		pdf.cell(0,3,ln=1)
-		pdf.cell(0,5,txt='RELACION DE GASTOS COMUNES DEL MES',ln=1,align='C',border=1,fill=True)
+		pdf.cell(0,5,txt='RESUMEN',ln=1,align='C',border=1,fill=True)
 		pdf.cell(0,3,ln=1)
 		pdf.set_font("Courier", size = 8) 
 
 
-		pdf.set_font("Courier",size=7.5)
-		for r in res: 
-			pdf.cell(0, 3, txt = r, ln = 1, align = 'C', border=0) 
+		pdf.set_font("Courier",size=7.5, style='B')
+		pdf.cell(165, 3, txt = 'ALICUOTA: {}                              TOTAL GASTOS COMUNES POR ALICUOTA Bs'.format(alicuota), ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '{:,.2f}'.format(gastos_x_alicuota), ln = 1, align = 'R', border=0)
+		pdf.cell(165, 3, txt = 'TOTAL GASTOS NO COMUNES Bs', ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
+		pdf.cell(165, 3, txt = 'SALDO MES(ES) ANTERIOR(ES) Bs', ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '{:,.2f}'.format(saldo), ln = 1, align = 'R', border=0)
+		pdf.cell(165, 3, txt = 'INTERESES DE MORA (1%) Bs', ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '{:,.2f}'.format(interes_mora), ln = 1, align = 'R', border=0)
+		pdf.cell(165, 3, txt = 'TOTAL A PAGAR Bs', ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '{:,.2f}'.format(total_a_pagar), ln = 1, align = 'R', border=0)
+
+
+
+
+
+
+		# for r in res: 
+		# 	pdf.set_font("Courier",size=7.5)
+		# 	pdf.cell(0, 3, txt = r, ln = 1, align = 'R', border=0)
+
 
 		pdf.cell(0,8,txt='',ln=1,border=0,fill=False)
 
@@ -492,15 +651,15 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 		pdf.cell(30,5,txt='Fondo de Reserva',ln=0,border=1,fill=True,align='C')
 		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(reserva),ln=0,border=1,fill=False,align='R')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva+reserva),ln=1,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(total_fondo_reserva+fondo_reserva),ln=1,border=1,fill=False,align='R')
 
 		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
 		pdf.cell(30,5,txt='Por cobrar a Ud.',ln=0,border=1,fill=True,align='C')
 		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo),ln=0,border=1,fill=False,align='R')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(monto_alicuota),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(gastos_x_alicuota),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+monto_alicuota+interes_mora),ln=1,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+gastos_x_alicuota+interes_mora),ln=1,border=1,fill=False,align='R')
 
 		pdf.output('pdf/'+filename)
 
@@ -599,7 +758,8 @@ def renderTableAuto(database,params):
 			if len(res)>max_width: max_width=len(res)
 		output.insert(1,'-'*(max_width-1))
 	else:
-		output=['La tabla está vacía...\n']
+		output=None
+		# output=['La tabla está vacía...\n']
 
 	return(output)
 

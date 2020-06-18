@@ -12,16 +12,11 @@ OTHER:
 
 PENDINGS
 
-	gastos -> expenses_period
-	locales -> buiding_units
-	libro -> account_book
+	gastos -> expenses
+	locales -> units
+	libro -> book
 
 	option_email_invoices()
-
-	parámetros del recibo:
-		fecha
-		número de la primera factura
-		monto del fondo de reserva
 
 IMPROVEMENTS
 

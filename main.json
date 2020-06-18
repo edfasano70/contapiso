@@ -2,5 +2,6 @@
     "database": "database/condominio.db3",
     "period": "052020",
     "sender_email": "alvafasa@gmail.com",
-    "sender_password": "Irama2017"
+    "sender_password": "Irama2017",
+    "last_invoice":"130970"
 }
