@@ -472,16 +472,16 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 			for r in report_gastos_comunes:
 				pdf.set_font("Courier",size=7.5)
 				pdf.cell(130, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['precio']), ln = 0, align = 'R', border=0)
-				pdf.cell(10, 3, txt = '{:,.2f}'.format(r['cantidad']), ln = 0, align = 'R', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['precio']), ln = 0, align = 'R', border=0)
+				pdf.cell(10, 3, txt = money(r['cantidad']), ln = 0, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['subtotal']), ln = 1, align = 'R', border=0)
 			pdf.set_font("Courier",size=7.5, style='B')
 			pdf.cell(165, 3, txt = 'SUBTOTAL Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(subtotal_gastos_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(subtotal_gastos_comunes), ln = 1, align = 'R', border=0)
 			pdf.cell(165, 3, txt = 'FONDO DE RESERVA (10%) Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondo_reserva), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(fondo_reserva), ln = 1, align = 'R', border=0)
 			pdf.cell(165, 3, txt = 'TOTAL GASTOS COMUNES Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(total_gastos_comunes), ln = 1, align = 'R', border=0)
 
 
 		if report_gastos_no_comunes!=[]:
@@ -499,12 +499,12 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 			for r in report_gastos_no_comunes:
 				pdf.set_font("Courier",size=7.5)
 				pdf.cell(130, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['precio']), ln = 0, align = 'R', border=0)
-				pdf.cell(10, 3, txt = '{:,.2f}'.format(r['cantidad']), ln = 0, align = 'R', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['precio']), ln = 0, align = 'R', border=0)
+				pdf.cell(10, 3, txt = money(r['cantidad']), ln = 0, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['subtotal']), ln = 1, align = 'R', border=0)
 			pdf.set_font("Courier",size=7.5, style='B')
 			pdf.cell(165, 3, txt = 'TOTAL GASTOS NO COMUNES Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
 
 		if report_fondos_comunes!=[]:
 			pdf.set_font("Courier", size = 8, style='B') 
@@ -519,10 +519,10 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 			for r in report_fondos_comunes:
 				pdf.set_font("Courier",size=7.5)
 				pdf.cell(165, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['subtotal']), ln = 1, align = 'R', border=0)
 			pdf.set_font("Courier",size=7.5, style='B')
 			pdf.cell(165, 3, txt = 'TOTAL FONDOS DE RESERVA COMUNES Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondos_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(fondos_comunes), ln = 1, align = 'R', border=0)
 
 
 		if report_fondos_no_comunes!=[]:
@@ -538,10 +538,10 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 			for r in report_fondos_no_comunes:
 				pdf.set_font("Courier",size=7.5)
 				pdf.cell(165, 3, txt = str(r['descripcion']), ln = 0, align = 'L', border=0)
-				pdf.cell(25, 3, txt = '{:,.2f}'.format(r['subtotal']), ln = 1, align = 'R', border=0)
+				pdf.cell(25, 3, txt = money(r['subtotal']), ln = 1, align = 'R', border=0)
 			pdf.set_font("Courier",size=7.5, style='B')
 			pdf.cell(165, 3, txt = 'TOTAL FONDOS DE RESERVA NO COMUNES Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondos_no_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(fondos_no_comunes), ln = 1, align = 'R', border=0)
 
 
 		pdf.set_font("Courier", size = 8, style='B') 
@@ -553,25 +553,27 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 
 		pdf.set_font("Courier",size=7.5, style='B')
 		pdf.cell(165, 3, txt = 'ALICUOTA: {}                              TOTAL GASTOS COMUNES POR ALICUOTA Bs'.format(alicuota), ln = 0, align = 'R', border=0)
-		pdf.cell(25, 3, txt = '{:,.2f}'.format(gastos_x_alicuota), ln = 1, align = 'R', border=0)
+		pdf.cell(25, 3, txt = money(gastos_x_alicuota), ln = 1, align = 'R', border=0)
 		pdf.cell(165, 3, txt = 'TOTAL GASTOS NO COMUNES Bs', ln = 0, align = 'R', border=0)
-		pdf.cell(25, 3, txt = '{:,.2f}'.format(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
+		pdf.cell(25, 3, txt = money(total_gastos_no_comunes), ln = 1, align = 'R', border=0)
 		pdf.cell(165, 3, txt = 'SALDO MES(ES) ANTERIOR(ES) Bs', ln = 0, align = 'R', border=0)
-		pdf.cell(25, 3, txt = '{:,.2f}'.format(saldo), ln = 1, align = 'R', border=0)
+		pdf.cell(25, 3, txt = money(saldo), ln = 1, align = 'R', border=0)
 		pdf.cell(165, 3, txt = 'INTERESES DE MORA (1%) Bs', ln = 0, align = 'R', border=0)
-		pdf.cell(25, 3, txt = '{:,.2f}'.format(interes_mora), ln = 1, align = 'R', border=0)
+		pdf.cell(25, 3, txt = money(interes_mora), ln = 1, align = 'R', border=0)
 
 		if fondos_comunes!=0:
 			pdf.cell(165, 3, txt = 'TOTAL FONDOS DE RESERVA COMUNES POR ALICUOTA Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondo_x_alicuota), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(fondo_x_alicuota), ln = 1, align = 'R', border=0)
 
 		if fondos_no_comunes!=0:
 			pdf.cell(165, 3, txt = 'TOTAL FONDOS DE RESERVA NO COMUNES Bs', ln = 0, align = 'R', border=0)
-			pdf.cell(25, 3, txt = '{:,.2f}'.format(fondos_no_comunes), ln = 1, align = 'R', border=0)
+			pdf.cell(25, 3, txt = money(fondos_no_comunes), ln = 1, align = 'R', border=0)
 
 
+		pdf.cell(165, 3, txt = '', ln = 0, align = 'R', border=0)
+		pdf.cell(25, 3, txt = '', ln = 1, align = 'R', border=0)
 		pdf.cell(165, 3, txt = 'TOTAL A PAGAR Bs', ln = 0, align = 'R', border=0)
-		pdf.cell(25, 3, txt = '{:,.2f}'.format(total_a_pagar), ln = 1, align = 'R', border=0)
+		pdf.cell(25, 3, txt = money(total_a_pagar), ln = 1, align = 'R', border=0)
 
 		pdf.cell(0,8,txt='',ln=1,border=0,fill=False)
 
@@ -584,17 +586,17 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 
 		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
 		pdf.cell(30,5,txt='Fondo de Reserva',ln=0,border=1,fill=True,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(fondo_reserva),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(fondo_reserva),ln=0,border=1,fill=False,align='R')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(total_fondo_reserva+fondo_reserva),ln=1,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(fondo_reserva),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(total_fondo_reserva+fondo_reserva),ln=1,border=1,fill=False,align='R')
 
 		pdf.cell(10,5,txt='',ln=0,border=0,fill=False)
 		pdf.cell(30,5,txt='Por cobrar a Ud.',ln=0,border=1,fill=True,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo),ln=0,border=1,fill=False,align='R')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(gastos_x_alicuota),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(saldo),ln=0,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(gastos_x_alicuota),ln=0,border=1,fill=False,align='R')
 		pdf.cell(35,5,txt='',ln=0,border=1,fill=False,align='C')
-		pdf.cell(35,5,txt='{:>15,.2f}'.format(saldo+gastos_x_alicuota+interes_mora),ln=1,border=1,fill=False,align='R')
+		pdf.cell(35,5,txt=money(saldo+gastos_x_alicuota+interes_mora),ln=1,border=1,fill=False,align='R')
 
 		pdf.output('pdf/'+filename)
 

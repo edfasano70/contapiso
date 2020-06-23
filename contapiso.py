@@ -168,6 +168,12 @@ def assign_value_2_dictkey(dict_name,dict_key,value=None):
 
 #GENERAL PURPOSE FUNCTIONS
 
+def money(value):
+	value='{:,.2f}'.format(value)
+	value=value.replace(',','@').replace('.',',').replace('@','.')
+
+	return value
+
 def date_time_now():
 	from datetime import datetime
 	now=datetime.now()
