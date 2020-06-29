@@ -400,9 +400,22 @@ def generate_invoice(data,invoice_date='01/01/2020',invoice_number=1,output='con
 
 	fondo_reserva 	=	subtotal_gastos_comunes*10/100
 	total_gastos_comunes	=	subtotal_gastos_comunes+fondo_reserva
+
 	alicuota 		=	data['alicuota']
+
+	if is_number(alicuota)==False:
+		alicuota=0
+
 	saldo 			= 	data['saldo']
-	interes_mora	=	saldo/100
+
+	if is_number(saldo)==False:
+		saldo=0
+
+	if saldo<=0:
+		interes_mora=0
+	else:	
+		interes_mora	=	saldo/100.0
+
 	gastos_x_alicuota	=	total_gastos_comunes*alicuota/100
 
 	fondo_x_alicuota	= fondos_comunes*alicuota/100
@@ -807,7 +820,7 @@ def option_generate_invoices():
 	for r in res:
 		generate_invoice(r,output='pdf',invoice_number=invoice_number,invoice_date=invoice_date)
 		console_progressbar(int(r['id']),total_invoices,30)
-		break
+		# break
 
 def option_email_invoices():
 	console_msgbox('ok','Opción enviar facturas',enter=True)
